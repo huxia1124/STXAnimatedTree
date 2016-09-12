@@ -87,9 +87,9 @@ int CALLBACK MySTXAnimatedTreeItemDrawFunc(LPSTXTVITEMDRAW lpItemDraw)
 #define MAX_LOADSTRING 100
 
 // Global variables:
-HINSTANCE hInst;								// 当前实例
-TCHAR szTitle[MAX_LOADSTRING];					// 标题栏文本
-TCHAR szWindowClass[MAX_LOADSTRING];			// 主窗口类名
+HINSTANCE hInst;								// Current instance
+TCHAR szTitle[MAX_LOADSTRING];					// Caption text
+TCHAR szWindowClass[MAX_LOADSTRING];			// Class name of main window
 
 HSTXTREENODE g_NodeParent = STXTVI_ROOT;
 HSTXTREENODE g_NodeC1Parent = STXTVI_ROOT;
@@ -106,7 +106,7 @@ IStream *pStreamWatermark = NULL;
 int iTimerStep = 0;
 
 
-// 此代码模块中包含的函数的前向声明:
+// forward declarations
 ATOM				MyRegisterClass(HINSTANCE hInstance);
 BOOL				InitInstance(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -154,13 +154,12 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
- 	// TODO: 在此放置代码。
 	MSG msg;
 	HACCEL hAccelTable;
 	
 	//////////////////////////////////////////////////////////////////////////
 
-	// 初始化全局字符串
+	// Initialize global strings
 	LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
 	LoadString(hInstance, IDC_STXANIMATEDTREETEST, szWindowClass, MAX_LOADSTRING);
 	MyRegisterClass(hInstance);
@@ -180,7 +179,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	pStream2 = LoadImageFromResource(NULL, MAKEINTRESOURCE(IDB_PNG2), _T("PNG"));
 	pStreamWatermark = LoadImageFromResource(NULL, MAKEINTRESOURCE(IDB_PNG_WATERMARK), _T("PNG"));
 
-	// 执行应用程序初始化:
+	// Application initialization
 	if (!InitInstance (hInstance, nCmdShow))
 	{
 		return FALSE;
@@ -188,7 +187,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_STXANIMATEDTREETEST));
 
-	// 主消息循环:
+	// Message loop
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
 		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
@@ -366,7 +365,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_COMMAND:
 		wmId    = LOWORD(wParam);
 		wmEvent = HIWORD(wParam);
-		// 分析菜单选择:
 		switch (wmId)
 		{
 		case IDM_ABOUT:
@@ -507,7 +505,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
-		// TODO: 在此添加任意绘图代码...
 		EndPaint(hWnd, &ps);
 		break;
 	case WM_ERASEBKGND:
@@ -532,7 +529,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		PostQuitMessage(0);
 		break;
 	case WM_LBUTTONDOWN:
-		//g_pWnd->Internal_InsertNode(_T("AAA"));
 		break;
 	case WM_NOTIFY:
 		{
@@ -544,7 +540,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					LPSTXATVNITEM pNM = reinterpret_cast<LPSTXATVNITEM>(pNMHDR);
 					TCHAR szBuf[200];
 					g_pWnd->Internal_GetItemText(pNM->hNode, szBuf, 200);
-					MessageBox(NULL, szBuf, _T("Double Click"), MB_OK);
+					MessageBox(hWnd, szBuf, _T("Double Click"), MB_OK);
 				}
 				break;
 			}
