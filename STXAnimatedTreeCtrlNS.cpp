@@ -1192,21 +1192,24 @@ void CSTXAnimatedTreeCtrlNS::DrawBackground(Gdiplus::Graphics *pGraphics, Gdiplu
 {
 	if(m_pImgBackground)
 	{
-		if(!m_pImgBackgroundCached)
-		{
-			Gdiplus::Bitmap* pBitmap = new Gdiplus::Bitmap(rectThis->Width, rectThis->Height); 
-			Gdiplus::Graphics graphics(pBitmap);
-			graphics.DrawImage(m_pImgBackground.get(), 0, 0, rectThis->Width, rectThis->Height);
+		//Gdiplus::SolidBrush brushBk(m_clrBackground);
+		//pGraphics->FillRectangle(&brushBk, rectThis->X, rectThis->Y, rectThis->Width, rectThis->Height);
 
-			Gdiplus::Bitmap *pBitmapSrc = pBitmap;
-			std::tr1::shared_ptr<Gdiplus::CachedBitmap> imgCached(new Gdiplus::CachedBitmap(pBitmapSrc, pGraphics));
-			m_pImgBackgroundCached = imgCached;
+		//if(!m_pImgBackgroundCached)
+		//{
+		//	Gdiplus::Bitmap* pBitmap = new Gdiplus::Bitmap(rectThis->Width, rectThis->Height); 
+		//	Gdiplus::Graphics graphics(pBitmap);
+		//	graphics.DrawImage(m_pImgBackground.get(), 0, 0, rectThis->Width, rectThis->Height);
 
-			delete pBitmap;
-		}
-		if(m_pImgBackgroundCached)
-			pGraphics->DrawCachedBitmap(m_pImgBackgroundCached.get(), 0, 0);
-		else
+		//	Gdiplus::Bitmap *pBitmapSrc = pBitmap;
+		//	std::tr1::shared_ptr<Gdiplus::CachedBitmap> imgCached(new Gdiplus::CachedBitmap(pBitmapSrc, pGraphics));
+		//	m_pImgBackgroundCached = imgCached;
+
+		//	delete pBitmap;
+		//}
+		//if(m_pImgBackgroundCached)
+		//	pGraphics->DrawCachedBitmap(m_pImgBackgroundCached.get(), 0, 0);
+		//else
 			pGraphics->DrawImage(m_pImgBackground.get(), rectThis->X, rectThis->Y, rectThis->Width, rectThis->Height);
 	}
 	else

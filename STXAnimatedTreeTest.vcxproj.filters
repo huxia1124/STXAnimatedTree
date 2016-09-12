@@ -27,6 +27,9 @@
     <ClCompile Include="STXAnimatedTreeCtrlNS.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="STXAnchor.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">
@@ -45,6 +48,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="STXAnimatedTreeCtrlNS.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="STXAnchor.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

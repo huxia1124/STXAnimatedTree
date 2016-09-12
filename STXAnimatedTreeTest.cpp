@@ -16,6 +16,7 @@
 
 #include "shlwapi.h"
 #include <string>
+#include "STXAnchor.h"
 
 using namespace std;
 
@@ -25,6 +26,7 @@ CSTXAnimatedTreeCtrlNS *g_pWnd = NULL;
 CSTXAnimatedTreeCtrl *g_pWnd = NULL;
 #endif
 
+CSTXAnchor *_anchor = NULL;
 
 int CALLBACK STXTestSortFunc( LPARAM lParamItem1, LPARAM lParamItem2, LPARAM lParamSort )
 {
@@ -246,7 +248,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 #endif
 
 
-   hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+   hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW|WS_CLIPCHILDREN,
 	   CW_USEDEFAULT, 0, 640, 600, NULL, NULL, hInstance, NULL);
 
    if (!hWnd)
@@ -262,10 +264,12 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    g_pWnd->Create(szTitle, WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_BORDER,
 	   0, 0, 320, 520, hWnd, 600);
 
+   _anchor = new CSTXAnchor(hWnd);
+
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
-
+   _anchor->AddItem(g_pWnd->GetSafeHwnd(), STXANCHOR_ALL);
 
    //g_pWnd->ModifyStyle(0, STXTVS_ALWAYS_SHOW_EXPANDER|STXTVS_NO_LINES);
    g_pWnd->ModifyStyle(0, STXTVS_HORIZONTAL_SCROLL);
@@ -299,6 +303,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    CreateWindow(_T("BUTTON"), _T("SetSelection SubImage"), WS_CHILD|WS_VISIBLE, 352, 330, 240, 24, hWnd, (HMENU)1012, NULL, NULL);
    CreateWindow(_T("BUTTON"), _T("Always Show Expander"), WS_CHILD|WS_VISIBLE, 352, 360, 240, 24, hWnd, (HMENU)1013, NULL, NULL);
    CreateWindow(_T("BUTTON"), _T("Custom Draw"), WS_CHILD|WS_VISIBLE, 352, 390, 240, 24, hWnd, (HMENU)1014, NULL, NULL);
+
+   for(UINT btnId = 1001; btnId <= 1014; btnId++)
+		_anchor->AddItem(btnId, STXANCHOR_RIGHT|STXANCHOR_TOP);
 
    SetTimer(hWnd, 1, 120, NULL);
 
@@ -521,6 +528,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		::DestroyWindow(g_pWnd->GetSafeHwnd());
 		delete g_pWnd;
 		g_pWnd = NULL;
+		delete _anchor;
 		PostQuitMessage(0);
 		break;
 	case WM_LBUTTONDOWN:
