@@ -28,6 +28,7 @@ CSTXAnimatedTreeCtrl *g_pWnd = NULL;
 
 CSTXAnchor *_anchor = NULL;
 
+//Item comparing function
 int CALLBACK STXTestSortFunc( LPARAM lParamItem1, LPARAM lParamItem2, LPARAM lParamSort )
 {
 	if(lParamItem1 < lParamItem2)
@@ -48,6 +49,7 @@ int CALLBACK STXTestSortItemFunc( HSTXTREENODE hItem1, HSTXTREENODE hItem2, LPAR
 	return iFactor * _tcscmp(szBuf1, szBuf2);
 }
 
+//Custom Draw function
 int CALLBACK MySTXAnimatedTreeItemDrawFunc(LPSTXTVITEMDRAW lpItemDraw)
 {
 	switch(lpItemDraw->dwStage)
@@ -289,10 +291,10 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    if(pImgCollapsed)	pImgCollapsed->Release();
 
    CreateWindow(_T("BUTTON"), _T("Add Root Node"), WS_CHILD|WS_VISIBLE, 352, 0, 240, 24, hWnd, (HMENU)1001, NULL, NULL);
-   CreateWindow(_T("BUTTON"), _T("Add Child"), WS_CHILD|WS_VISIBLE, 352, 30, 240, 24, hWnd, (HMENU)1002, NULL, NULL);
-   CreateWindow(_T("BUTTON"), _T("Add Child^2"), WS_CHILD|WS_VISIBLE, 352, 60, 240, 24, hWnd, (HMENU)1003, NULL, NULL);
-   CreateWindow(_T("BUTTON"), _T("Add Child^3"), WS_CHILD|WS_VISIBLE, 352, 90, 240, 24, hWnd, (HMENU)1004, NULL, NULL);
-   CreateWindow(_T("BUTTON"), _T("* [Default Demo]"), WS_CHILD|WS_VISIBLE, 352, 120, 240, 24, hWnd, (HMENU)1005, NULL, NULL);
+   CreateWindow(_T("BUTTON"), _T("Add Child at Level 1"), WS_CHILD|WS_VISIBLE, 352, 30, 240, 24, hWnd, (HMENU)1002, NULL, NULL);
+   CreateWindow(_T("BUTTON"), _T("Add Child at Level 2"), WS_CHILD|WS_VISIBLE, 352, 60, 240, 24, hWnd, (HMENU)1003, NULL, NULL);
+   CreateWindow(_T("BUTTON"), _T("Add Child at Level 3"), WS_CHILD|WS_VISIBLE, 352, 90, 240, 24, hWnd, (HMENU)1004, NULL, NULL);
+   CreateWindow(_T("BUTTON"), _T("Play Default Demo Again"), WS_CHILD|WS_VISIBLE, 352, 120, 240, 24, hWnd, (HMENU)1005, NULL, NULL);
    CreateWindow(_T("BUTTON"), _T("SetSelectionImage"), WS_CHILD|WS_VISIBLE, 352, 150, 240, 24, hWnd, (HMENU)1006, NULL, NULL);
    CreateWindow(_T("BUTTON"), _T("ClearSelectionImage"), WS_CHILD|WS_VISIBLE, 352, 180, 240, 24, hWnd, (HMENU)1007, NULL, NULL);
    CreateWindow(_T("BUTTON"), _T("Batch Insert"), WS_CHILD|WS_VISIBLE, 352, 210, 240, 24, hWnd, (HMENU)1008, NULL, NULL);
@@ -301,7 +303,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    CreateWindow(_T("BUTTON"), _T("Sort Children of Selection"), WS_CHILD|WS_VISIBLE, 352, 300, 240, 24, hWnd, (HMENU)1011, NULL, NULL);
    CreateWindow(_T("BUTTON"), _T("SetSelection SubImage"), WS_CHILD|WS_VISIBLE, 352, 330, 240, 24, hWnd, (HMENU)1012, NULL, NULL);
    CreateWindow(_T("BUTTON"), _T("Always Show Expander"), WS_CHILD|WS_VISIBLE, 352, 360, 240, 24, hWnd, (HMENU)1013, NULL, NULL);
-   CreateWindow(_T("BUTTON"), _T("Custom Draw"), WS_CHILD|WS_VISIBLE, 352, 390, 240, 24, hWnd, (HMENU)1014, NULL, NULL);
+   CreateWindow(_T("BUTTON"), _T("Toggle Custom Draw"), WS_CHILD|WS_VISIBLE, 352, 390, 240, 24, hWnd, (HMENU)1014, NULL, NULL);
 
    for(UINT btnId = 1001; btnId <= 1014; btnId++)
 		_anchor->AddItem(btnId, STXANCHOR_RIGHT|STXANCHOR_TOP);
