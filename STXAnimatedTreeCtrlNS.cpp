@@ -2269,6 +2269,7 @@ void CSTXAnimatedTreeCtrlNS::SelectNode( HSTXTREENODE hNode )
 		{
 			hNode->m_bSelected = TRUE;
 		}
+		SendCommonNotifyMessage(STXATVN_SELECTEDITEMCHANGED, hNode, 0);
 		InvalidateRect(m_hwndControl, NULL, TRUE);
 	}
 }
