@@ -1192,24 +1192,21 @@ void CSTXAnimatedTreeCtrlNS::DrawBackground(Gdiplus::Graphics *pGraphics, Gdiplu
 {
 	if(m_pImgBackground)
 	{
-		//Gdiplus::SolidBrush brushBk(m_clrBackground);
-		//pGraphics->FillRectangle(&brushBk, rectThis->X, rectThis->Y, rectThis->Width, rectThis->Height);
+		if(!m_pImgBackgroundCached)
+		{
+			Gdiplus::Bitmap* pBitmap = new Gdiplus::Bitmap(rectThis->Width, rectThis->Height); 
+			Gdiplus::Graphics graphics(pBitmap);
+			graphics.DrawImage(m_pImgBackground.get(), 0, 0, rectThis->Width, rectThis->Height);
 
-		//if(!m_pImgBackgroundCached)
-		//{
-		//	Gdiplus::Bitmap* pBitmap = new Gdiplus::Bitmap(rectThis->Width, rectThis->Height); 
-		//	Gdiplus::Graphics graphics(pBitmap);
-		//	graphics.DrawImage(m_pImgBackground.get(), 0, 0, rectThis->Width, rectThis->Height);
+			Gdiplus::Bitmap *pBitmapSrc = pBitmap;
+			std::tr1::shared_ptr<Gdiplus::CachedBitmap> imgCached(new Gdiplus::CachedBitmap(pBitmapSrc, pGraphics));
+			m_pImgBackgroundCached = imgCached;
 
-		//	Gdiplus::Bitmap *pBitmapSrc = pBitmap;
-		//	std::tr1::shared_ptr<Gdiplus::CachedBitmap> imgCached(new Gdiplus::CachedBitmap(pBitmapSrc, pGraphics));
-		//	m_pImgBackgroundCached = imgCached;
-
-		//	delete pBitmap;
-		//}
-		//if(m_pImgBackgroundCached)
-		//	pGraphics->DrawCachedBitmap(m_pImgBackgroundCached.get(), 0, 0);
-		//else
+			delete pBitmap;
+		}
+		if(m_pImgBackgroundCached)
+			pGraphics->DrawCachedBitmap(m_pImgBackgroundCached.get(), 0, 0);
+		else
 			pGraphics->DrawImage(m_pImgBackground.get(), rectThis->X, rectThis->Y, rectThis->Width, rectThis->Height);
 	}
 	else
@@ -1714,7 +1711,7 @@ void CSTXAnimatedTreeCtrlNS::OnKeyDown_Right()
 	if(m_hSelectedNode == NULL)
 		return;
 
-	if(!m_hSelectedNode->m_bExpanded && m_hSelectedNode->m_arrChildNodes.size() > 0)
+	if(!m_hSelectedNode->m_bExpanded && (m_hSelectedNode->m_arrChildNodes.size() > 0 || m_hSelectedNode->m_dwItemStyle & STXTVIS_FORCE_SHOW_EXPANDER))
 		Internal_Expand(m_hSelectedNode, STXATVE_EXPAND);
 	else
 	{
@@ -2831,6 +2828,8 @@ BOOL CSTXAnimatedTreeCtrlNS::Internal_DeleteItem(HSTXTREENODE hItem)
 	STXTREENODELIST *pListToDeleteFrom = &m_arrRootNodes;
 	std::queue<std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> > *pDeleteQueue = &m_queDeletedNodes;
 
+	HSTXTREENODE originalSelectedNode = m_hSelectedNode;
+
 	if(hItem == STXTVI_ROOT)
 	{
 		//Trigger PreDelete Event
@@ -2940,10 +2939,12 @@ BOOL CSTXAnimatedTreeCtrlNS::Internal_DeleteItem(HSTXTREENODE hItem)
 		ResetScrollBars();
 		InvalidateRect(m_hwndControl, NULL, TRUE);
 
-		return TRUE;
 	}
 
-	return FALSE;
+	if(originalSelectedNode != m_hSelectedNode)
+		SendCommonNotifyMessage(STXATVN_SELECTEDITEMCHANGED, m_hSelectedNode, 0);
+
+	return TRUE;
 }
 
 void CSTXAnimatedTreeCtrlNS::ApplySmoothStopTransition(IUIAnimationVariable *pVar, UI_ANIMATION_SECONDS duration, DOUBLE fTargetValue, IUIAnimationStoryboard *pStoryboard, BOOL bResetVelocity)
@@ -3200,7 +3201,7 @@ bool CSTXAnimatedTreeCtrlNS::STXAnimatedTreeDefaultSortFuncWrapper(std::tr1::sha
 		return s_sortStructure.pfnSortItem(pNode1.get(), pNode2.get(), s_sortStructure.lParamSort) < 0;
 }
 
-BOOL CSTXAnimatedTreeCtrlNS::Internal_SortChildren( HSTXTREENODE hItem, STXAnimatedTreeSortFuncType pfnSortFunc, LPARAM lParamSort )
+BOOL CSTXAnimatedTreeCtrlNS::Internal_SortChildren( HSTXTREENODE hItem, std::function<int(LPARAM, LPARAM, LPARAM)> pfnSortFunc, LPARAM lParamSort )
 {
 	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
 		return FALSE;
@@ -3225,7 +3226,7 @@ BOOL CSTXAnimatedTreeCtrlNS::Internal_SortChildren( HSTXTREENODE hItem, STXAnima
 	return TRUE;
 }
 
-BOOL CSTXAnimatedTreeCtrlNS::Internal_SortChildrenByItem( HSTXTREENODE hItem, STXAnimatedTreeSortItemFuncType pfnSortFunc, LPARAM lParamSort )
+BOOL CSTXAnimatedTreeCtrlNS::Internal_SortChildrenByItem( HSTXTREENODE hItem, std::function<int(HSTXTREENODE, HSTXTREENODE, LPARAM)> pfnSortFunc, LPARAM lParamSort )
 {
 	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
 		return FALSE;
@@ -4039,5 +4040,17 @@ void CSTXAnimatedTreeCtrlNS::SetWatermarkOpacity(double fOpacity)
 
 	if (GetSafeHwnd() && m_pImgWatermark)
 		InvalidateRect(m_hwndControl, NULL, TRUE);
+}
+
+BOOL CSTXAnimatedTreeCtrlNS::Internal_SelectItem(HSTXTREENODE hItem)
+{
+	if (hItem == m_hSelectedNode)
+		return FALSE;
+
+	if (hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_ROOT || hItem == STXTVI_SORT)
+		return FALSE;
+
+	SelectNode(hItem);
+	return TRUE;
 }
 
