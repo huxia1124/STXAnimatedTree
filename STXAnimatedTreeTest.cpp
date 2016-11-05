@@ -304,8 +304,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    CreateWindow(_T("BUTTON"), _T("SetSelection SubImage"), WS_CHILD|WS_VISIBLE, 352, 330, 240, 24, hWnd, (HMENU)1012, NULL, NULL);
    CreateWindow(_T("BUTTON"), _T("Always Show Expander"), WS_CHILD|WS_VISIBLE, 352, 360, 240, 24, hWnd, (HMENU)1013, NULL, NULL);
    CreateWindow(_T("BUTTON"), _T("Toggle Custom Draw"), WS_CHILD|WS_VISIBLE, 352, 390, 240, 24, hWnd, (HMENU)1014, NULL, NULL);
+   CreateWindow(_T("BUTTON"), _T("Set SubText for Selected Node"), WS_CHILD|WS_VISIBLE, 352,420, 240, 24, hWnd, (HMENU)1015, NULL, NULL);
 
-   for(UINT btnId = 1001; btnId <= 1014; btnId++)
+   for(UINT btnId = 1001; btnId <= 1015; btnId++)
 		_anchor->AddItem(btnId, STXANCHOR_RIGHT|STXANCHOR_TOP);
 
    SetTimer(hWnd, 1, 120, NULL);
@@ -331,7 +332,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_TIMER:
 		iTimerStep++;
-		if(iTimerStep == 1) g_pWnd->Internal_InsertItem(_T("Root 1. Animated Tree Control Demo by Steven Xia"));
+		if(iTimerStep == 1) g_pWnd->Internal_InsertItem(_T("Root 1. Animated Tree Control Demo by Huan Xia"));
 		if(iTimerStep == 2) g_NodeParent = g_pWnd->Internal_InsertItem(_T("Root 2. Windows 7/8/10 supported."));
 		if(iTimerStep == 3) g_NodeToSetImage[0] = g_pWnd->Internal_InsertItem(_T("Root 3. "));
 		if(iTimerStep == 20)g_pWnd->Internal_InsertItem(_T("Root 0"), STXTVI_ROOT, STXTVI_FIRST);
@@ -499,7 +500,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						g_pWnd->Internal_SetItemDrawFunction(MySTXAnimatedTreeItemDrawFunc);
 					else
 						g_pWnd->Internal_SetItemDrawFunction(NULL);
-			}
+				}
+				break;
+			case 1015:
+				{
+				TCHAR szSubText[16];
+				_stprintf_s(szSubText, _T("%d"), rand() % 10);
+				HSTXTREENODE hNode = g_pWnd->GetSelectedItem();
+				g_pWnd->Internal_SetItemSubText(hNode, szSubText);
+				}
 				break;
 			}
 		}
