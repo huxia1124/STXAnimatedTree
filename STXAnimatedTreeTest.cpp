@@ -21,12 +21,12 @@
 using namespace std;
 
 #ifdef USING_NS_VERSION
-CSTXAnimatedTreeCtrlNS *g_pWnd = NULL;
+CSTXAnimatedTreeCtrlNS *g_pWnd = nullptr;
 #else 
-CSTXAnimatedTreeCtrl *g_pWnd = NULL;
+CSTXAnimatedTreeCtrl *g_pWnd = nullptr;
 #endif
 
-CSTXAnchor *_anchor = NULL;
+CSTXAnchor *_anchor = nullptr;
 
 //Item comparing function
 int CALLBACK STXTestSortFunc( LPARAM lParamItem1, LPARAM lParamItem2, LPARAM lParamSort )
@@ -99,11 +99,10 @@ HSTXTREENODE g_NodeC2Parent = STXTVI_ROOT;
 HSTXTREENODE g_NodeC3Parent = STXTVI_ROOT;
 HSTXTREENODE g_NodeToSetImage[16];
 
-IStream *pStreamBK = NULL;
-IStream *pStreamMail = NULL;
-IStream *pStream1 = NULL;
-IStream *pStream2 = NULL;
-IStream *pStreamWatermark = NULL;
+IStream *pStreamBK = nullptr;
+IStream *pStreamMail = nullptr;
+IStream *pStream1 = nullptr;
+IStream *pStream2 = nullptr;
 
 int iTimerStep = 0;
 
@@ -125,12 +124,12 @@ LPCTSTR GetRandomString()
 IStream* LoadImageFromResource(HMODULE hModule, LPCWSTR lpName, LPCWSTR lpType)
 {
 	HRSRC hRC = FindResource(hModule, lpName, lpType);
-	if(hRC == NULL)
-		return NULL;
+	if(hRC == nullptr)
+		return nullptr;
 
 	HGLOBAL hPkg = LoadResource(hModule, hRC);
-	if(hPkg == NULL)
-		return NULL;
+	if(hPkg == nullptr)
+		return nullptr;
 
 	DWORD dwSize = SizeofResource(hModule, hRC);
 	LPVOID pData = LockResource(hPkg);
@@ -142,7 +141,7 @@ IStream* LoadImageFromResource(HMODULE hModule, LPCWSTR lpName, LPCWSTR lpType)
 
 	UnlockResource(hPkg);
 
-	IStream *pStream = NULL;
+	IStream *pStream = nullptr;
 	CreateStreamOnHGlobal(hImage, TRUE, &pStream);
 
 	return pStream;
@@ -166,20 +165,19 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	LoadString(hInstance, IDC_STXANIMATEDTREETEST, szWindowClass, MAX_LOADSTRING);
 	MyRegisterClass(hInstance);
 
-	GetModuleFileName(NULL, szExePath, MAX_PATH);
+	GetModuleFileName(nullptr, szExePath, MAX_PATH);
 	LPTSTR pszName = PathFindFileName(szExePath);
 	pszName[0] = 0;
 
-	CoInitialize(NULL);
+	CoInitialize(nullptr);
 	ULONG_PTR m_gdiplusToken = 0;
 	Gdiplus::GdiplusStartupInput gdiplusStartupInput;  
-	Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
+	Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, nullptr);
 
-	pStreamBK = LoadImageFromResource(NULL, MAKEINTRESOURCE(IDB_PNG_BK), _T("PNG"));
-	pStreamMail = LoadImageFromResource(NULL, MAKEINTRESOURCE(IDB_PNG_MAIL), _T("PNG"));
-	pStream1 = LoadImageFromResource(NULL, MAKEINTRESOURCE(IDB_PNG1), _T("PNG"));
-	pStream2 = LoadImageFromResource(NULL, MAKEINTRESOURCE(IDB_PNG2), _T("PNG"));
-	pStreamWatermark = LoadImageFromResource(NULL, MAKEINTRESOURCE(IDB_PNG_WATERMARK), _T("PNG"));
+	pStreamBK = LoadImageFromResource(nullptr, MAKEINTRESOURCE(IDB_PNG_BK), _T("PNG"));
+	pStreamMail = LoadImageFromResource(nullptr, MAKEINTRESOURCE(IDB_PNG_MAIL), _T("PNG"));
+	pStream1 = LoadImageFromResource(nullptr, MAKEINTRESOURCE(IDB_PNG1), _T("PNG"));
+	pStream2 = LoadImageFromResource(nullptr, MAKEINTRESOURCE(IDB_PNG2), _T("PNG"));
 
 	// Application initialization
 	if (!InitInstance (hInstance, nCmdShow))
@@ -190,7 +188,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_STXANIMATEDTREETEST));
 
 	// Message loop
-	while (GetMessage(&msg, NULL, 0, 0))
+	while (GetMessage(&msg, nullptr, 0, 0))
 	{
 		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
 		{
@@ -205,7 +203,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	if(pStreamMail) pStreamMail->Release();
 	if(pStream1) pStream1->Release();
 	if(pStream2) pStream2->Release();
-	if (pStreamWatermark) pStreamWatermark->Release();
 
 	Gdiplus::GdiplusShutdown(m_gdiplusToken);
 	CoUninitialize();
@@ -225,9 +222,9 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	wcex.cbWndExtra		= 0;
 	wcex.hInstance		= hInstance;
 	wcex.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_STXANIMATEDTREETEST));
-	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
+	wcex.hCursor		= LoadCursor(nullptr, IDC_ARROW);
 	wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
-	//wcex.hbrBackground	= NULL;
+	//wcex.hbrBackground	= nullptr;
 	wcex.lpszMenuName	= MAKEINTRESOURCE(IDC_STXANIMATEDTREETEST);
 	wcex.lpszClassName	= szWindowClass;
 	wcex.hIconSm		= LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
@@ -250,7 +247,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 
    hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW|WS_CLIPCHILDREN,
-	   CW_USEDEFAULT, 0, 640, 600, NULL, NULL, hInstance, NULL);
+	   CW_USEDEFAULT, 0, 640, 600, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {
@@ -276,40 +273,41 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    g_pWnd->ModifyStyle(0, STXTVS_HORIZONTAL_SCROLL);
 
    g_pWnd->Internal_SetBackgroundImage(pStreamBK);
-   g_pWnd->Internal_SetWatermarkImage(pStreamWatermark);
-   g_pWnd->SetWatermarkOpacity(0.4f);
+
+   //g_pWnd->Internal_SetWatermarkImage(pStreamWatermark);		// A small custom image appears on the right-bottom. Use your own watermark if you want.
+   //g_pWnd->SetWatermarkOpacity(0.4f);
 
    STXTVSORTFUNC func;
    func.lParamSort = 0;
    func.pfnSortFunc = STXTestSortFunc;
    g_pWnd->Internal_SetDefaultSortFunction(&func);
 
-   IStream *pImgExpanded = LoadImageFromResource(NULL, MAKEINTRESOURCE(IDB_PNG_EXPANDED), _T("PNG"));
-   IStream *pImgCollapsed = LoadImageFromResource(NULL, MAKEINTRESOURCE(IDB_PNG_COLLAPSED), _T("PNG"));
+   IStream *pImgExpanded = LoadImageFromResource(nullptr, MAKEINTRESOURCE(IDB_PNG_EXPANDED), _T("PNG"));
+   IStream *pImgCollapsed = LoadImageFromResource(nullptr, MAKEINTRESOURCE(IDB_PNG_COLLAPSED), _T("PNG"));
    g_pWnd->Internal_SetExpanderImage(pImgExpanded, pImgCollapsed);
    if(pImgExpanded)	pImgExpanded->Release();
    if(pImgCollapsed)	pImgCollapsed->Release();
 
-   CreateWindow(_T("BUTTON"), _T("Add Root Node"), WS_CHILD|WS_VISIBLE, 352, 0, 240, 24, hWnd, (HMENU)1001, NULL, NULL);
-   CreateWindow(_T("BUTTON"), _T("Add Child at Level 1"), WS_CHILD|WS_VISIBLE, 352, 30, 240, 24, hWnd, (HMENU)1002, NULL, NULL);
-   CreateWindow(_T("BUTTON"), _T("Add Child at Level 2"), WS_CHILD|WS_VISIBLE, 352, 60, 240, 24, hWnd, (HMENU)1003, NULL, NULL);
-   CreateWindow(_T("BUTTON"), _T("Add Child at Level 3"), WS_CHILD|WS_VISIBLE, 352, 90, 240, 24, hWnd, (HMENU)1004, NULL, NULL);
-   CreateWindow(_T("BUTTON"), _T("Play Default Demo Again"), WS_CHILD|WS_VISIBLE, 352, 120, 240, 24, hWnd, (HMENU)1005, NULL, NULL);
-   CreateWindow(_T("BUTTON"), _T("SetSelectionImage"), WS_CHILD|WS_VISIBLE, 352, 150, 240, 24, hWnd, (HMENU)1006, NULL, NULL);
-   CreateWindow(_T("BUTTON"), _T("ClearSelectionImage"), WS_CHILD|WS_VISIBLE, 352, 180, 240, 24, hWnd, (HMENU)1007, NULL, NULL);
-   CreateWindow(_T("BUTTON"), _T("Batch Insert"), WS_CHILD|WS_VISIBLE, 352, 210, 240, 24, hWnd, (HMENU)1008, NULL, NULL);
-   CreateWindow(_T("BUTTON"), _T("Delete Selection"), WS_CHILD|WS_VISIBLE, 352, 240, 240, 24, hWnd, (HMENU)1009, NULL, NULL);
-   CreateWindow(_T("BUTTON"), _T("Delete All (Clear)"), WS_CHILD|WS_VISIBLE, 352, 270, 240, 24, hWnd, (HMENU)1010, NULL, NULL);
-   CreateWindow(_T("BUTTON"), _T("Sort Children of Selection"), WS_CHILD|WS_VISIBLE, 352, 300, 240, 24, hWnd, (HMENU)1011, NULL, NULL);
-   CreateWindow(_T("BUTTON"), _T("SetSelection SubImage"), WS_CHILD|WS_VISIBLE, 352, 330, 240, 24, hWnd, (HMENU)1012, NULL, NULL);
-   CreateWindow(_T("BUTTON"), _T("Always Show Expander"), WS_CHILD|WS_VISIBLE, 352, 360, 240, 24, hWnd, (HMENU)1013, NULL, NULL);
-   CreateWindow(_T("BUTTON"), _T("Toggle Custom Draw"), WS_CHILD|WS_VISIBLE, 352, 390, 240, 24, hWnd, (HMENU)1014, NULL, NULL);
-   CreateWindow(_T("BUTTON"), _T("Set SubText for Selected Node"), WS_CHILD|WS_VISIBLE, 352,420, 240, 24, hWnd, (HMENU)1015, NULL, NULL);
+   CreateWindow(_T("BUTTON"), _T("Add Root Node"), WS_CHILD|WS_VISIBLE, 352, 0, 240, 24, hWnd, (HMENU)1001, nullptr, nullptr);
+   CreateWindow(_T("BUTTON"), _T("Add Child at Level 1"), WS_CHILD|WS_VISIBLE, 352, 30, 240, 24, hWnd, (HMENU)1002, nullptr, nullptr);
+   CreateWindow(_T("BUTTON"), _T("Add Child at Level 2"), WS_CHILD|WS_VISIBLE, 352, 60, 240, 24, hWnd, (HMENU)1003, nullptr, nullptr);
+   CreateWindow(_T("BUTTON"), _T("Add Child at Level 3"), WS_CHILD|WS_VISIBLE, 352, 90, 240, 24, hWnd, (HMENU)1004, nullptr, nullptr);
+   CreateWindow(_T("BUTTON"), _T("Play Default Demo Again"), WS_CHILD|WS_VISIBLE, 352, 120, 240, 24, hWnd, (HMENU)1005, nullptr, nullptr);
+   CreateWindow(_T("BUTTON"), _T("SetSelectionImage"), WS_CHILD|WS_VISIBLE, 352, 150, 240, 24, hWnd, (HMENU)1006, nullptr, nullptr);
+   CreateWindow(_T("BUTTON"), _T("ClearSelectionImage"), WS_CHILD|WS_VISIBLE, 352, 180, 240, 24, hWnd, (HMENU)1007, nullptr, nullptr);
+   CreateWindow(_T("BUTTON"), _T("Batch Insert"), WS_CHILD|WS_VISIBLE, 352, 210, 240, 24, hWnd, (HMENU)1008, nullptr, nullptr);
+   CreateWindow(_T("BUTTON"), _T("Delete Selection"), WS_CHILD|WS_VISIBLE, 352, 240, 240, 24, hWnd, (HMENU)1009, nullptr, nullptr);
+   CreateWindow(_T("BUTTON"), _T("Delete All (Clear)"), WS_CHILD|WS_VISIBLE, 352, 270, 240, 24, hWnd, (HMENU)1010, nullptr, nullptr);
+   CreateWindow(_T("BUTTON"), _T("Sort Children of Selection"), WS_CHILD|WS_VISIBLE, 352, 300, 240, 24, hWnd, (HMENU)1011, nullptr, nullptr);
+   CreateWindow(_T("BUTTON"), _T("SetSelection SubImage"), WS_CHILD|WS_VISIBLE, 352, 330, 240, 24, hWnd, (HMENU)1012, nullptr, nullptr);
+   CreateWindow(_T("BUTTON"), _T("Always Show Expander"), WS_CHILD|WS_VISIBLE, 352, 360, 240, 24, hWnd, (HMENU)1013, nullptr, nullptr);
+   CreateWindow(_T("BUTTON"), _T("Toggle Custom Draw"), WS_CHILD|WS_VISIBLE, 352, 390, 240, 24, hWnd, (HMENU)1014, nullptr, nullptr);
+   CreateWindow(_T("BUTTON"), _T("Set SubText for Selected Node"), WS_CHILD|WS_VISIBLE, 352,420, 240, 24, hWnd, (HMENU)1015, nullptr, nullptr);
 
    for(UINT btnId = 1001; btnId <= 1015; btnId++)
 		_anchor->AddItem(btnId, STXANCHOR_RIGHT|STXANCHOR_TOP);
 
-   SetTimer(hWnd, 1, 120, NULL);
+   SetTimer(hWnd, 1, 120, nullptr);
 
    return TRUE;
 }
@@ -396,7 +394,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			case 1005:		// * Do Default Demo Again
 				iTimerStep = 0;
-				SetTimer(hWnd, 1, 50, NULL);
+				SetTimer(hWnd, 1, 50, nullptr);
 				break;
 			case 1006:
 				{
@@ -408,7 +406,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case 1007:
 				{
 					HSTXTREENODE hNode = g_pWnd->GetSelectedItem();
-					g_pWnd->SetItemImage(hNode, (IStream*)NULL);
+					g_pWnd->SetItemImage(hNode, (IStream*)nullptr);
 				}
 				break;
 			case 1008:		//Batch Insert
@@ -457,13 +455,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
  					HSTXTREENODE hNode = g_pWnd->GetSelectedItem();
  					//g_pWnd->Internal_SetItemHeight(hNode, rand() % 30 + 16);
 
-					if(hNode == NULL)
+					if(hNode == nullptr)
 						hNode = STXTVI_ROOT;
  
  					g_pWnd->Internal_SortChildrenByItem(hNode, STXTestSortItemFunc, 100);
  					iFactor = -1 * iFactor;
 
-//  					int n = g_pWnd->Internal_FindItems(STXTVI_ROOT, STXTestSearchCompareFunc, 0, NULL, 0);
+//  					int n = g_pWnd->Internal_FindItems(STXTVI_ROOT, STXTestSearchCompareFunc, 0, nullptr, 0);
 //  					if(n > 0)
 //  					{
 //  						HSTXTREENODE *pOut = new HSTXTREENODE[n];
@@ -480,7 +478,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case 1012:
 				{
 					HSTXTREENODE hNode = g_pWnd->GetSelectedItem();
-					IStream *pSubImage = LoadImageFromResource(NULL, MAKEINTRESOURCE(IDB_PNG_SUB_IMAGE), _T("PNG"));
+					IStream *pSubImage = LoadImageFromResource(nullptr, MAKEINTRESOURCE(IDB_PNG_SUB_IMAGE), _T("PNG"));
 					g_pWnd->SetItemSubImage(hNode, pSubImage);
 					if(pSubImage)	pSubImage->Release();
 				}
@@ -499,13 +497,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					if (bCustomDraw)
 						g_pWnd->Internal_SetItemDrawFunction(MySTXAnimatedTreeItemDrawFunc);
 					else
-						g_pWnd->Internal_SetItemDrawFunction(NULL);
+						g_pWnd->Internal_SetItemDrawFunction(nullptr);
 				}
 				break;
 			case 1015:
 				{
 				TCHAR szSubText[16];
-				_stprintf_s(szSubText, _T("%d"), rand() % 10);
+				_stprintf_s(szSubText, _T("%d"), rand() % 100);
 				HSTXTREENODE hNode = g_pWnd->GetSelectedItem();
 				g_pWnd->Internal_SetItemSubText(hNode, szSubText);
 				}
@@ -535,7 +533,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		::DestroyWindow(g_pWnd->GetSafeHwnd());
 		delete g_pWnd;
-		g_pWnd = NULL;
+		g_pWnd = nullptr;
 		delete _anchor;
 		PostQuitMessage(0);
 		break;

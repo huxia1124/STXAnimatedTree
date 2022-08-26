@@ -25,7 +25,7 @@
 
 CSTXAnchorItem::CSTXAnchorItem(HWND hToolWnd,DWORD dwAnchor)
 {
-	m_pParentAnchor = NULL;
+	m_pParentAnchor = nullptr;
 	
 	m_AnchorItemInfo.iItemType = STXANCHOR_ITEM_WINDOW;
 
@@ -42,7 +42,7 @@ CSTXAnchorItem::CSTXAnchorItem(HWND hToolWnd,DWORD dwAnchor)
 
 CSTXAnchorItem::CSTXAnchorItem(UINT uDlgItemID,DWORD dwAnchor)
 {
-	m_pParentAnchor = NULL;
+	m_pParentAnchor = nullptr;
 
 	m_AnchorItemInfo.iItemType = STXANCHOR_ITEM_DLGITEM;
 
@@ -59,7 +59,7 @@ CSTXAnchorItem::~CSTXAnchorItem()
 
 void CSTXAnchorItem::Adjust(int cxDelta,int cyDelta)
 {
-	HWND hToolWnd = NULL;
+	HWND hToolWnd = nullptr;
 	switch(m_AnchorItemInfo.iItemType)
 	{
 	case STXANCHOR_ITEM_WINDOW:
@@ -70,7 +70,7 @@ void CSTXAnchorItem::Adjust(int cxDelta,int cyDelta)
 		break;
 	}
 
-	if(hToolWnd == NULL)
+	if(hToolWnd == nullptr)
 		return;
 	
 	//Retrieve the rect of the Tool
@@ -101,7 +101,7 @@ void CSTXAnchorItem::Adjust(int cxDelta,int cyDelta)
 	//The following code is to avoid flash
 	InvalidateRect(GetParent(hToolWnd) ,&rcOld, TRUE);
 	ValidateRect(GetParent(hToolWnd), &m_AnchorItemInfo.rcItem);
-	RedrawWindow(hToolWnd, NULL, NULL, 0);
+	RedrawWindow(hToolWnd, nullptr, nullptr, 0);
 	UpdateWindow(GetParent(hToolWnd));
 
 }
@@ -118,8 +118,8 @@ void CSTXAnchorItem::SetParentAnchor(CSTXAnchor *pParentAnchor)
 CSTXAnchor::CSTXAnchor()
 {
 	s_AnchorBaseID = 0;
-	m_hSizeTraceWnd = NULL;
-	m_pfnOldProc = NULL;
+	m_hSizeTraceWnd = nullptr;
+	m_pfnOldProc = nullptr;
 	m_iAnchorID = s_AnchorBaseID++;
 }
 
@@ -147,7 +147,7 @@ CSTXAnchor::CSTXAnchor(HWND hSizeTraceWnd)
 
 	//Save an original WndProc for multi Tricks
 	HANDLE hOriginWndProc = ::GetProp(hSizeTraceWnd,_T("STX_ORIGIN_WNDPROC"));
-	if(hOriginWndProc == NULL)
+	if(hOriginWndProc == nullptr)
 	{
 		::SetProp(hSizeTraceWnd,_T("STX_ORIGIN_WNDPROC"),(HANDLE)m_pfnOldProc);
 		::SetProp(hSizeTraceWnd,_T("STX_WNDPROC_REFERENCE_COUNT"),(HANDLE)1);
@@ -271,7 +271,7 @@ LRESULT CALLBACK CSTXAnchor::NewWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 {
 	if(uMsg == WM_SIZE)
 	{
-		CSTXAnchor *pAnchor = NULL;
+		CSTXAnchor *pAnchor = nullptr;
 		int i = 0;
 		CString strAnchorDataName;
 		strAnchorDataName.Format(_T("STX_ANCHOR_DATA_%d"),i);

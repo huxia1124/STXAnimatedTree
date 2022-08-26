@@ -53,7 +53,7 @@
 
 //////////////////////////////////////////////////////////////////////////
 
-typedef std::list<std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> >  STXTREENODELIST;
+typedef std::list<std::shared_ptr<CSTXAnimatedTreeNodeNS> >  STXTREENODELIST;
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -61,7 +61,7 @@ CSTXAnimatedTreeNodeNS::CSTXAnimatedTreeNodeNS(CSTXAnimatedTreeCtrlNS *pParentCo
 : m_pParentControl(pParentControl)
 {
 	static long sAccID = 1;
-	m_pParentNode = NULL;
+	m_pParentNode = nullptr;
 	m_bExpanded = TRUE;
 	m_bSelected = FALSE;
 	m_bHover = FALSE;
@@ -136,7 +136,7 @@ DOUBLE CSTXAnimatedTreeNodeNS::GetCurrentHeightWithoutLastChildExpand()
 	if(m_arrChildNodes.size() > 0)
 	{
 		//Get last sibling item's height first
-		std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> pLastItem = *m_arrChildNodes.rbegin();
+		std::shared_ptr<CSTXAnimatedTreeNodeNS> pLastItem = *m_arrChildNodes.rbegin();
 		pLastItem->m_pAVItemHeight->GetValue(&fHeight);
 	}
 
@@ -207,11 +207,11 @@ void CSTXAnimatedTreeNodeNS::DrawItem(Gdiplus::Graphics *pGraphics, Gdiplus::Rec
 	{
 		DrawDropHighlight(pGraphics, rectItem, rectItemFinal, fNodeOpacity);
 
-		int iImageOccupie = DrawItemImage(NULL, rectItem, rectItemFinal, fHorzOffset, fNodeOpacity, &itemDraw);
+		int iImageOccupie = DrawItemImage(nullptr, rectItem, rectItemFinal, fHorzOffset, fNodeOpacity, &itemDraw);
 
 		itemDraw.rectPart = rectItem;
 		itemDraw.dwStage = STXTV_STAGE_BACKGROUND;
-		if(m_pParentControl->m_pfnItemDrawFunc == NULL || m_pParentControl->m_pfnItemDrawFunc(&itemDraw) == STXTV_CDRF_DODEFAULT)
+		if(m_pParentControl->m_pfnItemDrawFunc == nullptr || m_pParentControl->m_pfnItemDrawFunc(&itemDraw) == STXTV_CDRF_DODEFAULT)
 		{
 			DrawHover(pGraphics, rectItem, rectItemFinal, fHorzOffset, fNodeOpacity, iImageOccupie);
 			DrawSelection(pGraphics, rectItem, rectItemFinal, fHorzOffset, fNodeOpacity, iImageOccupie);
@@ -222,7 +222,7 @@ void CSTXAnimatedTreeNodeNS::DrawItem(Gdiplus::Graphics *pGraphics, Gdiplus::Rec
 		Gdiplus::RectF rectTextMain(rectItem->X + iImageOccupie - fHorzOffset, rectItem->Y, rectItem->Width - iImageOccupie + fHorzOffset + STXAT_MEASURE_STRING_WIDTH_FIX, rectItem->Height);
 		itemDraw.rectPart = &rectTextMain;
 		itemDraw.dwStage = STXTV_STAGE_TEXT;
-		if(m_pParentControl->m_pfnItemDrawFunc == NULL || m_pParentControl->m_pfnItemDrawFunc(&itemDraw) == STXTV_CDRF_DODEFAULT)
+		if(m_pParentControl->m_pfnItemDrawFunc == nullptr || m_pParentControl->m_pfnItemDrawFunc(&itemDraw) == STXTV_CDRF_DODEFAULT)
 		{
 			Gdiplus::PointF ptTextMain(rectItem->X + iImageOccupie, rectItem->Y);
 			Gdiplus::StringFormat strFormat;
@@ -263,13 +263,13 @@ void CSTXAnimatedTreeNodeNS::DrawItem(Gdiplus::Graphics *pGraphics, Gdiplus::Rec
 	//if(!m_bExpanded)
 	//	return;
 
-	std::queue<std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> > m_queueAllToDraw;
+	std::queue<std::shared_ptr<CSTXAnimatedTreeNodeNS> > m_queueAllToDraw;
 
 	//Draw Deleted items
 	size_t nDrawDelete = m_queDeletedNodes.size();
 	for(size_t i=0;i<nDrawDelete;i++)
 	{
-		std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> pItem = m_queDeletedNodes.front();
+		std::shared_ptr<CSTXAnimatedTreeNodeNS> pItem = m_queDeletedNodes.front();
 		m_queDeletedNodes.pop();
 
 		DOUBLE fItemOpacity = 0;
@@ -293,7 +293,7 @@ void CSTXAnimatedTreeNodeNS::DrawItem(Gdiplus::Graphics *pGraphics, Gdiplus::Rec
 	size_t nItemToDraw = m_queueAllToDraw.size();
 	for(size_t i=0;i<nItemToDraw;i++)
 	{
-		std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> pItem = m_queueAllToDraw.front();
+		std::shared_ptr<CSTXAnimatedTreeNodeNS> pItem = m_queueAllToDraw.front();
 		m_queueAllToDraw.pop();
 
 		DOUBLE fTopOffset = 0;
@@ -343,7 +343,7 @@ void CSTXAnimatedTreeNodeNS::DrawExpandMark(Gdiplus::Graphics * pGraphics, Gdipl
 
 	DOUBLE fExpanderOpacity = fNodeOpacity * fGlobalExpanderOpacity;
 
-	std::tr1::shared_ptr<Gdiplus::Image> pImgUsing = m_pParentControl->m_pImgExpanderExpanded;
+	std::shared_ptr<Gdiplus::Image> pImgUsing = m_pParentControl->m_pImgExpanderExpanded;
 	if(!m_bExpanded)
 		pImgUsing = m_pParentControl->m_pImgExpanderCollapsed;
 	if(pImgUsing)
@@ -394,8 +394,8 @@ void CSTXAnimatedTreeNodeNS::DrawLines(Gdiplus::Graphics * pGraphics, Gdiplus::R
 
 	if(m_bExpanded && m_arrChildNodes.size() > 0)
 	{
-		std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> pFirstItem = *m_arrChildNodes.begin();
-		std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> pLastItem = *m_arrChildNodes.rbegin();
+		std::shared_ptr<CSTXAnimatedTreeNodeNS> pFirstItem = *m_arrChildNodes.begin();
+		std::shared_ptr<CSTXAnimatedTreeNodeNS> pLastItem = *m_arrChildNodes.rbegin();
 
 		DOUBLE fItemHeightFinal = 0.0;
 		m_pAVItemHeight->GetFinalValue(&fItemHeightFinal);
@@ -465,17 +465,17 @@ int CSTXAnimatedTreeNodeNS::DrawItemImage(Gdiplus::Graphics * pGraphics, Gdiplus
 
 	int iResult = static_cast<int>(fImageOccupy);
 
-	if(pGraphics == NULL)
+	if(pGraphics == nullptr)
 		return iResult;
 	
-	if(m_pImgImage == NULL && (m_dwItemStyle & STXTVIS_IMAGE_CALLBACK) == 0)
+	if(m_pImgImage == nullptr && (m_dwItemStyle & STXTVIS_IMAGE_CALLBACK) == 0)
 		return iResult;
 
-	std::tr1::shared_ptr<Gdiplus::Image> imgUse = m_pImgImage;
+	std::shared_ptr<Gdiplus::Image> imgUse = m_pImgImage;
 	if(m_dwItemStyle & STXTVIS_IMAGE_CALLBACK)
 		imgUse = m_pParentControl->OnItemImageCallback(this);
 
-	if(imgUse == NULL)
+	if(imgUse == nullptr)
 		return iResult;
 
 	DOUBLE fItemHeight = 0;
@@ -496,7 +496,7 @@ int CSTXAnimatedTreeNodeNS::DrawItemImage(Gdiplus::Graphics * pGraphics, Gdiplus
 
 	Gdiplus::RectF rectImgDest(rectItem->X - rPartOffset - fHorzOffset, rectItem->Y - rPartOffset, static_cast<Gdiplus::REAL>(rItemHeight)+rPartIncrease, static_cast<Gdiplus::REAL>(rItemHeight)+rPartIncrease);
 	Gdiplus::REAL rOpacity = static_cast<Gdiplus::REAL>(fNodeOpacity) * rImageExtraOpacity;
-	Gdiplus::ColorMatrix *pCMUse = NULL;
+	Gdiplus::ColorMatrix *pCMUse = nullptr;
 	Gdiplus::ColorMatrix cm = { 
 		1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
@@ -518,7 +518,7 @@ int CSTXAnimatedTreeNodeNS::DrawItemImage(Gdiplus::Graphics * pGraphics, Gdiplus
 
 	lpItemDraw->rectPart = &rectImgDest;
 	lpItemDraw->dwStage = STXTV_STAGE_IMAGE;
-	if(m_pParentControl->m_pfnItemDrawFunc == NULL || m_pParentControl->m_pfnItemDrawFunc(lpItemDraw) == STXTV_CDRF_DODEFAULT)
+	if(m_pParentControl->m_pfnItemDrawFunc == nullptr || m_pParentControl->m_pfnItemDrawFunc(lpItemDraw) == STXTV_CDRF_DODEFAULT)
 	{
 		if((m_pParentControl->GetStyle() & STXTVS_DRAW_GRAY_IMAGE)
 			|| (lpItemDraw->dwItemState & STXTVIS_GRAY_IMAGE))
@@ -556,7 +556,7 @@ int CSTXAnimatedTreeNodeNS::DrawItemImage(Gdiplus::Graphics * pGraphics, Gdiplus
 
 			lpItemDraw->rectPart = &rectSubImgDest;
 			lpItemDraw->dwStage = STXTV_STAGE_SUBIMAGE;
-			if(m_pParentControl->m_pfnItemDrawFunc == NULL || m_pParentControl->m_pfnItemDrawFunc(lpItemDraw) == STXTV_CDRF_DODEFAULT)
+			if(m_pParentControl->m_pfnItemDrawFunc == nullptr || m_pParentControl->m_pfnItemDrawFunc(lpItemDraw) == STXTV_CDRF_DODEFAULT)
 			{
 				Gdiplus::ImageAttributes ImgAttr;
 
@@ -615,7 +615,7 @@ HSTXTREENODE CSTXAnimatedTreeNodeNS::HitTest(POINT pt, int iControlWidth,  int i
 
 	int iYOffset = static_cast<int>(fYOffset);
 	if(pt.y < iYOffset)
-		return NULL;
+		return nullptr;
 
 	//Convert to local offset
 	pt.y -= iOffsetPatch;
@@ -659,7 +659,7 @@ HSTXTREENODE CSTXAnimatedTreeNodeNS::HitTest(POINT pt, int iControlWidth,  int i
 
 	if(m_bExpanded)
 	{
-		HSTXTREENODE hNodeHit = NULL;
+		HSTXTREENODE hNodeHit = nullptr;
 		STXTREENODELIST::iterator it = m_arrChildNodes.begin();
 		for(;it!=m_arrChildNodes.end();it++)
 		{
@@ -673,7 +673,7 @@ HSTXTREENODE CSTXAnimatedTreeNodeNS::HitTest(POINT pt, int iControlWidth,  int i
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void CSTXAnimatedTreeNodeNS::TriggerItemPreDeleteEvent()
@@ -705,7 +705,7 @@ void CSTXAnimatedTreeNodeNS::OnMouseEnter()
 	m_pParentControl->m_AnimationTransitionLibrary->CreateInstantaneousTransition(1.0, &pTrans);
 	pStory->AddTransition(m_pAVHoverOpacity, pTrans);
 
-	pStory->Schedule(m_pParentControl->GetCurrentTime(), NULL);
+	pStory->Schedule(m_pParentControl->GetCurrentTime(), nullptr);
 }
 
 void CSTXAnimatedTreeNodeNS::OnMouseLeave()
@@ -719,7 +719,7 @@ void CSTXAnimatedTreeNodeNS::OnMouseLeave()
 void CSTXAnimatedTreeNodeNS::DrawImage( Gdiplus::Graphics *pGraphics, Gdiplus::Image *pImage, DOUBLE fOpacity, Gdiplus::RectF *rectImage)
 {
 	Gdiplus::REAL rOpacity = static_cast<Gdiplus::REAL>(fOpacity);
-	Gdiplus::ColorMatrix *pCMUse = NULL;
+	Gdiplus::ColorMatrix *pCMUse = nullptr;
 	Gdiplus::ColorMatrix cm = { 
 		1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
@@ -796,25 +796,25 @@ CSTXAnimatedTreeCtrlNS::SORT_STRUCTURE CSTXAnimatedTreeCtrlNS::s_sortStructure;
 
 CSTXAnimatedTreeCtrlNS::CSTXAnimatedTreeCtrlNS(void)
 {
-	m_hwndControl = NULL;
+	m_hwndControl = nullptr;
 	m_nDefaultAnimationDuration = 0.8;
-	m_hSelectedNode = NULL;
+	m_hSelectedNode = nullptr;
 	m_bMouseInControl = FALSE;
 	COLORREF clrWindow = GetSysColor(COLOR_WINDOW);
 	m_clrBackground = Gdiplus::Color(255, GetRValue(clrWindow), GetGValue(clrWindow), GetBValue(clrWindow));
 	m_bLButtonDown = FALSE;
 	m_bAllowDragDrop = FALSE;
 	m_bDragging = FALSE;
-	m_hDragOverNode = NULL;
-	m_hLastHoverNode = NULL;
-	m_hLastFloatTriggeredNode = NULL;
-	m_sortFuncDefault.pfnSortFunc = NULL;
+	m_hDragOverNode = nullptr;
+	m_hLastHoverNode = nullptr;
+	m_hLastFloatTriggeredNode = nullptr;
+	m_sortFuncDefault.pfnSortFunc = nullptr;
 	m_sortFuncDefault.lParamSort = 0;
-	m_pfnItemDrawFunc = NULL;
+	m_pfnItemDrawFunc = nullptr;
 	m_nLButtonDownHitFlags = 0;
 	m_nItemIndent = STXATC_ITEM_INDENT;
-	m_pDefaultFont = NULL;
-	m_pDefaultSubTextFont = NULL;
+	m_pDefaultFont = nullptr;
+	m_pDefaultSubTextFont = nullptr;
 	m_nWatermarkLocation = STXTV_WATERMARK_RIGHT_BOTTOM;
 	m_fWatermarkOpacity = 1.0f;
 }
@@ -825,20 +825,20 @@ CSTXAnimatedTreeCtrlNS::~CSTXAnimatedTreeCtrlNS(void)
 
 HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_InsertItem( LPCTSTR lpszText, HSTXTREENODE hParent /*= STXTVI_ROOT*/, HSTXTREENODE hInsertBefore /*= STXTVI_LAST*/, DWORD_PTR dwItemData /*= 0*/, int iItemHeight /*= -1*/ )
 {
-	std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> pNewNode(new CSTXAnimatedTreeNodeNS(this));
+	std::shared_ptr<CSTXAnimatedTreeNodeNS> pNewNode(new CSTXAnimatedTreeNodeNS(this));
 	m_setValidItemPtr.insert(pNewNode.get());
 	pNewNode->m_strText = lpszText;
 	pNewNode->m_dwNodeData = dwItemData;
 	return Internal_InsertItem(pNewNode, hParent, hInsertBefore, iItemHeight);
 }
 
-HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_InsertItem( std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> pNewNode, HSTXTREENODE hParent /*= STXTVI_ROOT*/, HSTXTREENODE hInsertBefore /*= STXTVI_LAST*/, int iItemHeight /*= -1*/ )
+HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_InsertItem( std::shared_ptr<CSTXAnimatedTreeNodeNS> pNewNode, HSTXTREENODE hParent /*= STXTVI_ROOT*/, HSTXTREENODE hInsertBefore /*= STXTVI_LAST*/, int iItemHeight /*= -1*/ )
 {
  	DOUBLE fLeftOffset = STXATC_EXPANDER_WIDTH;
 
 	STXTREENODELIST *pListToAddIn = &m_arrRootNodes;
 
-	HSTXTREENODE hNodeParentToSet = NULL;
+	HSTXTREENODE hNodeParentToSet = nullptr;
 
 	if(hParent == STXTVI_ROOT)
  	{
@@ -846,8 +846,8 @@ HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_InsertItem( std::tr1::shared_ptr<C
  	}
 	else
 	{
-		if(hParent == NULL)
-			return NULL;
+		if(hParent == nullptr)
+			return nullptr;
 
 		hNodeParentToSet = hParent;
 
@@ -875,7 +875,7 @@ HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_InsertItem( std::tr1::shared_ptr<C
 	pNewNode->m_nLeftOffsetFix = static_cast<int>(fLeftOffset);
 
 	CComPtr<IUIAnimationTransition> pTransOpacity;
-	if(hNodeParentToSet == NULL || hNodeParentToSet->m_bExpanded)
+	if(hNodeParentToSet == nullptr || hNodeParentToSet->m_bExpanded)
 	{
 		m_AnimationTransitionLibrary->CreateSmoothStopTransition(m_nDefaultAnimationDuration, 1.0, &pTransOpacity);
 		pStory->AddTransition(pNewNode->m_pAVOpacity, pTransOpacity);
@@ -885,7 +885,7 @@ HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_InsertItem( std::tr1::shared_ptr<C
 
 	}
 
-	pStory->Schedule(GetCurrentTime(), NULL);
+	pStory->Schedule(GetCurrentTime(), nullptr);
 
 	pNewNode->m_pParentNode = hNodeParentToSet;
 
@@ -897,12 +897,12 @@ HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_InsertItem( std::tr1::shared_ptr<C
 		ApplyOffsetAfter(pListToAddIn, pNewNode.get(), iItemInitialHeight, pNewNode.get(), TRUE);
 
 		ResetScrollBars();
-		InvalidateRect(m_hwndControl, NULL, TRUE);
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
 		pNewNode->m_bInitialized = TRUE;
 		m_mapAccIdToItem[pNewNode->m_nAccID] = pNewNode.get();
 		return pNewNode.get();
 	}
-	else if(hInsertBefore == STXTVI_LAST || (hInsertBefore == STXTVI_SORT && m_sortFuncDefault.pfnSortFunc == NULL))
+	else if(hInsertBefore == STXTVI_LAST || (hInsertBefore == STXTVI_SORT && m_sortFuncDefault.pfnSortFunc == nullptr))
 	{
 		DOUBLE fHeightBeforeTheItem = GetCurrentTotalHeightBefore(pListToAddIn, STXTVI_LAST);
 		m_AnimationManager->CreateAnimationVariable(fHeightBeforeTheItem, &pNewNode->m_pAVTopOffset);
@@ -911,7 +911,7 @@ HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_InsertItem( std::tr1::shared_ptr<C
 
 		ApplyOffsetAfter(pListToAddIn, pNewNode.get(), iItemInitialHeight, pNewNode.get(), TRUE);
 		ResetScrollBars();
-		InvalidateRect(m_hwndControl, NULL, TRUE);
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
 		pNewNode->m_bInitialized = TRUE;
 		m_mapAccIdToItem[pNewNode->m_nAccID] = pNewNode.get();
 		return pNewNode.get();
@@ -938,7 +938,7 @@ HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_InsertItem( std::tr1::shared_ptr<C
 			return Internal_InsertItem(pNewNode->m_strText.c_str(), hParent, (*itInstered).get(), pNewNode->m_dwNodeData, iItemHeight);
 		}
 	}
-	else if(hInsertBefore != NULL)
+	else if(hInsertBefore != nullptr)
 	{
 		DOUBLE fHeightBeforeTheItem = GetCurrentTotalHeightBefore(pListToAddIn, hInsertBefore);
 		m_AnimationManager->CreateAnimationVariable(fHeightBeforeTheItem, &pNewNode->m_pAVTopOffset);
@@ -946,24 +946,24 @@ HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_InsertItem( std::tr1::shared_ptr<C
 		pNewNode->m_itPositionInParent = itInstered;
 		ApplyOffsetAfter(pListToAddIn, pNewNode.get(), iItemInitialHeight, pNewNode.get(), TRUE);
 		ResetScrollBars();
-		InvalidateRect(m_hwndControl, NULL, TRUE);
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
 		pNewNode->m_bInitialized = TRUE;
 		m_mapAccIdToItem[pNewNode->m_nAccID] = pNewNode.get();
 		return pNewNode.get();
 	}
 
-	return NULL;
+	return nullptr;
  }
 
 void CSTXAnimatedTreeCtrlNS::RegisterAnimatedTreeCtrlClass()
 {
 	WNDCLASS wc;
 	memset(&wc, 0, sizeof(wc));
-	wc.hInstance = GetModuleHandle(NULL);
+	wc.hInstance = GetModuleHandle(nullptr);
 	wc.lpfnWndProc = STXAnimatedTreeWindowProc;
 	wc.lpszClassName = s_lpszAnimatedTreeCtrlClassName;
 	wc.style = CS_HREDRAW|CS_VREDRAW|CS_DBLCLKS;
-	wc.hCursor = ::LoadCursor(NULL, MAKEINTRESOURCE(IDC_ARROW));
+	wc.hCursor = ::LoadCursor(nullptr, IDC_ARROW);
 
 	RegisterClass(&wc);
 }
@@ -973,28 +973,28 @@ BOOL CSTXAnimatedTreeCtrlNS::Create( LPCTSTR lpszWindowText, DWORD dwStyle, int 
 	if (GetSafeHwnd())
 		return FALSE;
 
-	if (FAILED(m_AnimationManager.CoCreateInstance(CLSID_UIAnimationManager, NULL, CLSCTX_ALL)))
+	if (FAILED(m_AnimationManager.CoCreateInstance(CLSID_UIAnimationManager, nullptr, CLSCTX_ALL)))
 		return FALSE;
 
-	if (FAILED(m_AnimationTimer.CoCreateInstance(CLSID_UIAnimationTimer, NULL, CLSCTX_ALL)))
+	if (FAILED(m_AnimationTimer.CoCreateInstance(CLSID_UIAnimationTimer, nullptr, CLSCTX_ALL)))
 		return FALSE;
 
-	if (FAILED(m_AnimationTransitionLibrary.CoCreateInstance(CLSID_UIAnimationTransitionLibrary, NULL, CLSCTX_ALL)))
+	if (FAILED(m_AnimationTransitionLibrary.CoCreateInstance(CLSID_UIAnimationTransitionLibrary, nullptr, CLSCTX_ALL)))
 		return FALSE;
 
 	m_AnimationManager->SetManagerEventHandler(this);
 	m_AnimationManager->CreateAnimationVariable(0.0, &m_pAVExpanderOpacity);
 
 
-	HWND hWnd = CreateWindow(s_lpszAnimatedTreeCtrlClassName, lpszWindowText, dwStyle, x, y, cx, cy, hWndParent, (HMENU)nID, GetModuleHandle(NULL), NULL);
-	if(hWnd == NULL)
+	HWND hWnd = CreateWindow(s_lpszAnimatedTreeCtrlClassName, lpszWindowText, dwStyle, x, y, cx, cy, hWndParent, (HMENU)nID, GetModuleHandle(nullptr), nullptr);
+	if(hWnd == nullptr)
 		return FALSE;
 
 	SetWindowLongPtr(hWnd, GWL_USERDATA, (LONG_PTR)this);
 	m_hwndControl = hWnd;
 
 //	HFONT hFont = (HFONT)::GetStockObject(DEFAULT_GUI_FONT);
-//	if (hFont != NULL)
+//	if (hFont != nullptr)
 //	{
 //		::SendMessage(m_hwndControl, WM_SETFONT, (WPARAM)hFont, FALSE);
 //	}
@@ -1014,7 +1014,7 @@ void CSTXAnimatedTreeCtrlNS::OnTimer(UINT nIDEvent)
 	if(nIDEvent == STXTC_TIMER_ID_ANIMATION)
 	{
 		UpdateAnimationManager();
-		InvalidateRect(m_hwndControl, NULL, TRUE);
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
 	}
 	else if(nIDEvent == STXTC_TIMER_ID_ITEM_FLOAT_CHECK)
 	{
@@ -1025,7 +1025,7 @@ void CSTXAnimatedTreeCtrlNS::OnTimer(UINT nIDEvent)
 LRESULT CALLBACK CSTXAnimatedTreeCtrlNS::STXAnimatedTreeWindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
 	CSTXAnimatedTreeCtrlNS *pThis = (CSTXAnimatedTreeCtrlNS*)GetWindowLongPtr(hwnd, GWL_USERDATA);
-	if(pThis == NULL)
+	if(pThis == nullptr)
 		return DefWindowProc(hwnd, uMsg, wParam, lParam);
 
 	switch(uMsg)
@@ -1130,7 +1130,7 @@ void CSTXAnimatedTreeCtrlNS::DrawWatermark(Gdiplus::Graphics *pGraphics, Gdiplus
 		UINT nImgWidth = m_pImgWatermark->GetWidth();
 		UINT nImgHeight = m_pImgWatermark->GetHeight();
 
-		Gdiplus::ColorMatrix *pCMUse = NULL;
+		Gdiplus::ColorMatrix *pCMUse = nullptr;
 		Gdiplus::ColorMatrix cm = {
 			1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 			0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
@@ -1158,7 +1158,7 @@ void CSTXAnimatedTreeCtrlNS::DrawWatermark(Gdiplus::Graphics *pGraphics, Gdiplus
 
 
 			Gdiplus::Bitmap *pBitmapSrc = pBitmap;
-			std::tr1::shared_ptr<Gdiplus::CachedBitmap> imgCached(new Gdiplus::CachedBitmap(pBitmapSrc, &graphics));
+			std::shared_ptr<Gdiplus::CachedBitmap> imgCached(new Gdiplus::CachedBitmap(pBitmapSrc, &graphics));
 			m_pImgWatermarkCached = imgCached;
 
 			delete pBitmap;
@@ -1199,7 +1199,7 @@ void CSTXAnimatedTreeCtrlNS::DrawBackground(Gdiplus::Graphics *pGraphics, Gdiplu
 			graphics.DrawImage(m_pImgBackground.get(), 0, 0, rectThis->Width, rectThis->Height);
 
 			Gdiplus::Bitmap *pBitmapSrc = pBitmap;
-			std::tr1::shared_ptr<Gdiplus::CachedBitmap> imgCached(new Gdiplus::CachedBitmap(pBitmapSrc, pGraphics));
+			std::shared_ptr<Gdiplus::CachedBitmap> imgCached(new Gdiplus::CachedBitmap(pBitmapSrc, pGraphics));
 			m_pImgBackgroundCached = imgCached;
 
 			delete pBitmap;
@@ -1226,13 +1226,13 @@ void CSTXAnimatedTreeCtrlNS::DrawContent(Gdiplus::Graphics *pGraphics, Gdiplus::
 	RECT rcClient;
 	GetClientRect(m_hwndControl, &rcClient);
 
-	std::queue<std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> > m_queueAllToDraw;
+	std::queue<std::shared_ptr<CSTXAnimatedTreeNodeNS> > m_queueAllToDraw;
 
 	//Draw Deleted items
 	size_t nDrawDelete = m_queDeletedNodes.size();
 	for(size_t i=0;i<nDrawDelete;i++)
 	{
-		std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> pItem = m_queDeletedNodes.front();
+		std::shared_ptr<CSTXAnimatedTreeNodeNS> pItem = m_queDeletedNodes.front();
 		m_queDeletedNodes.pop();
 
 		DOUBLE fItemOpacity = 0;
@@ -1254,7 +1254,7 @@ void CSTXAnimatedTreeCtrlNS::DrawContent(Gdiplus::Graphics *pGraphics, Gdiplus::
 	size_t nItemToDraw = m_queueAllToDraw.size();
 	for(size_t i=0;i<nItemToDraw;i++)
 	{
-		std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> pItem = m_queueAllToDraw.front();
+		std::shared_ptr<CSTXAnimatedTreeNodeNS> pItem = m_queueAllToDraw.front();
 		m_queueAllToDraw.pop();
 
 		DOUBLE fTopOffset = 0;
@@ -1322,8 +1322,8 @@ void CSTXAnimatedTreeCtrlNS::DrawLine(Gdiplus::Graphics *pGraphics, Gdiplus::Rec
 
 	if(m_arrRootNodes.size() > 0)
 	{
-		std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> pFirstItem = *m_arrRootNodes.begin();
-		std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> pLastItem = *m_arrRootNodes.rbegin();
+		std::shared_ptr<CSTXAnimatedTreeNodeNS> pFirstItem = *m_arrRootNodes.begin();
+		std::shared_ptr<CSTXAnimatedTreeNodeNS> pLastItem = *m_arrRootNodes.rbegin();
 		DOUBLE fItemHeightFirst = 0;
 		pFirstItem->m_pAVItemHeight->GetValue(&fItemHeightFirst);
 		DOUBLE fItemHeightLast = 0;
@@ -1340,7 +1340,7 @@ HRESULT CSTXAnimatedTreeCtrlNS::OnManagerStatusChanged(UI_ANIMATION_MANAGER_STAT
 	if(newStatus == UI_ANIMATION_MANAGER_BUSY)
 	{
 		//OutputDebugString(_T("Activate...\n"));
-		::SetTimer(m_hwndControl, STXTC_TIMER_ID_ANIMATION, 10, NULL);
+		::SetTimer(m_hwndControl, STXTC_TIMER_ID_ANIMATION, 10, nullptr);
 	}
 	else
 	{
@@ -1422,16 +1422,16 @@ void CSTXAnimatedTreeCtrlNS::ApplyOffsetAfter(STXTREENODELIST *pList, HSTXTREENO
 	}
 
 	if(nApply > 0)
-		pStory->Schedule(GetCurrentTime(), NULL);
+		pStory->Schedule(GetCurrentTime(), nullptr);
 
 	if(bParentApply)
 	{
-		if(hNodeBaseline != NULL && hNodeBaseline->m_pParentNode != NULL)
+		if(hNodeBaseline != nullptr && hNodeBaseline->m_pParentNode != nullptr)
 		{
 			if(!hNodeBaseline->m_pParentNode->m_bExpanded)
 				return;
 
-			if(hNodeBaseline->m_pParentNode->m_pParentNode != NULL)
+			if(hNodeBaseline->m_pParentNode->m_pParentNode != nullptr)
 			{
 				ApplyOffsetAfter(&hNodeBaseline->m_pParentNode->m_pParentNode->m_arrChildNodes, hNodeBaseline->m_pParentNode, fOffset, hNodeBaseline->m_pParentNode, bParentApply);
 			}
@@ -1449,7 +1449,7 @@ DOUBLE CSTXAnimatedTreeCtrlNS::GetCurrentHeightWithoutLastChildExpand()
 	if(m_arrRootNodes.size() > 0)
 	{
 		//Get last sibling item's height first
-		std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> pLastItem = *m_arrRootNodes.rbegin();
+		std::shared_ptr<CSTXAnimatedTreeNodeNS> pLastItem = *m_arrRootNodes.rbegin();
 		pLastItem->m_pAVItemHeight->GetValue(&fHeight);
 	}
 
@@ -1548,7 +1548,7 @@ void CSTXAnimatedTreeCtrlNS::OnHScroll(UINT nSBCode, UINT nPos, HWND hWndScrollB
 	// Set the new position of the thumb (scroll box).
 	SetScrollPos(m_hwndControl, SB_HORZ, curpos, TRUE);
 
-	InvalidateRect(m_hwndControl, NULL, TRUE);
+	InvalidateRect(m_hwndControl, nullptr, TRUE);
 }
 
 void CSTXAnimatedTreeCtrlNS::OnVScroll( UINT nSBCode, UINT nPos, HWND hWndScrollBar )
@@ -1624,7 +1624,7 @@ void CSTXAnimatedTreeCtrlNS::OnVScroll( UINT nSBCode, UINT nPos, HWND hWndScroll
 	// Set the new position of the thumb (scroll box).
 	SetScrollPos(m_hwndControl, SB_VERT, curpos, TRUE);
 
-	InvalidateRect(m_hwndControl, NULL, TRUE);
+	InvalidateRect(m_hwndControl, nullptr, TRUE);
 }
 
 void CSTXAnimatedTreeCtrlNS::OnMouseWheel(UINT nFlags, short zDelta, int x, int y)
@@ -1646,7 +1646,7 @@ void CSTXAnimatedTreeCtrlNS::OnMouseWheel(UINT nFlags, short zDelta, int x, int 
 	newpos = max(newpos, minpos);
 
 	SetScrollPos(m_hwndControl, SB_VERT, newpos, TRUE);
-	InvalidateRect(m_hwndControl, NULL, TRUE);
+	InvalidateRect(m_hwndControl, nullptr, TRUE);
 }
 
 void CSTXAnimatedTreeCtrlNS::OnLButtonDblClk(int x, int y, UINT nFlags)
@@ -1682,7 +1682,7 @@ void CSTXAnimatedTreeCtrlNS::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	}
 	else if(nChar == VK_RETURN)
 	{
-		if(m_hSelectedNode == NULL)
+		if(m_hSelectedNode == nullptr)
 			return;
 
 		Internal_Expand(m_hSelectedNode, STXATVE_TOGGLE);
@@ -1691,7 +1691,7 @@ void CSTXAnimatedTreeCtrlNS::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void CSTXAnimatedTreeCtrlNS::OnKeyDown_Left()
 {
-	if(m_hSelectedNode == NULL)
+	if(m_hSelectedNode == nullptr)
 		return;
 
 	if(m_hSelectedNode->m_bExpanded && m_hSelectedNode->m_arrChildNodes.size() > 0)
@@ -1708,7 +1708,7 @@ void CSTXAnimatedTreeCtrlNS::OnKeyDown_Left()
 }
 void CSTXAnimatedTreeCtrlNS::OnKeyDown_Right()
 {
-	if(m_hSelectedNode == NULL)
+	if(m_hSelectedNode == nullptr)
 		return;
 
 	if(!m_hSelectedNode->m_bExpanded && (m_hSelectedNode->m_arrChildNodes.size() > 0 || m_hSelectedNode->m_dwItemStyle & STXTVIS_FORCE_SHOW_EXPANDER))
@@ -1760,8 +1760,8 @@ void CSTXAnimatedTreeCtrlNS::OnLButtonUp(int x, int y, UINT nFlags, BOOL bForRBu
 	{
 		OnDrop(m_hDragOverNode);
 		m_hDragOverNode->m_iDropHighlight = 0;
-		InvalidateRect(m_hwndControl, NULL, TRUE);
-		m_hDragOverNode = NULL;
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
+		m_hDragOverNode = nullptr;
 	}
 	ReleaseCapture();
 
@@ -1781,7 +1781,7 @@ void CSTXAnimatedTreeCtrlNS::OnLButtonUp(int x, int y, UINT nFlags, BOOL bForRBu
 	}
 	else
 	{
-		SendCommonNotifyMessage(STXATVN_CLICK, NULL, bForRButton ? 1 : 0);
+		SendCommonNotifyMessage(STXATVN_CLICK, nullptr, bForRButton ? 1 : 0);
 	}
 
 }
@@ -1800,7 +1800,7 @@ void CSTXAnimatedTreeCtrlNS::OnMouseMove(int x, int y, UINT nFlags)
 	KillTimer(m_hwndControl, STXTC_TIMER_ID_ITEM_FLOAT_CHECK);
 	if(m_hLastHoverNode)
 	{
-		SetTimer(m_hwndControl, STXTC_TIMER_ID_ITEM_FLOAT_CHECK, STXTC_TIMER_INTERVAL_ITEM_FLOAT_CHECK, NULL);
+		SetTimer(m_hwndControl, STXTC_TIMER_ID_ITEM_FLOAT_CHECK, STXTC_TIMER_INTERVAL_ITEM_FLOAT_CHECK, nullptr);
 	}
 
 	TRACKMOUSEEVENT tme;
@@ -1812,7 +1812,7 @@ void CSTXAnimatedTreeCtrlNS::OnMouseMove(int x, int y, UINT nFlags)
 	POINT point;
 	point.x = x;
 	point.y = y;
-	HSTXTREENODE hNodeHover = Internal_NodeHitTest(point, NULL);
+	HSTXTREENODE hNodeHover = Internal_NodeHitTest(point, nullptr);
 
 	if(m_hLastHoverNode != hNodeHover)
 	{
@@ -1830,7 +1830,7 @@ void CSTXAnimatedTreeCtrlNS::OnMouseMove(int x, int y, UINT nFlags)
 		SendCommonNotifyMessage(STXATVN_HOVERITEMCHANGED, hNodeHover, 0);
 
 		if(!IsAnimationBusy())
-			InvalidateRect(m_hwndControl, NULL, FALSE);
+			InvalidateRect(m_hwndControl, nullptr, FALSE);
 	}
 
 	if(!m_bMouseInControl)
@@ -1848,17 +1848,17 @@ void CSTXAnimatedTreeCtrlNS::OnMouseLeave()
 {
 	if(m_hLastHoverNode)
 	{
-		OnInternalHoverItemChanged(NULL);
-		SendCommonNotifyMessage(STXATVN_HOVERITEMCHANGED, NULL, 0);
+		OnInternalHoverItemChanged(nullptr);
+		SendCommonNotifyMessage(STXATVN_HOVERITEMCHANGED, nullptr, 0);
 
 		if(IsValidItem(m_hLastHoverNode))
 		{
 			m_hLastHoverNode->OnMouseLeave();
-			InvalidateRect(m_hwndControl, NULL, FALSE);
+			InvalidateRect(m_hwndControl, nullptr, FALSE);
 		}
 	}
-	m_hLastHoverNode = NULL;
-	m_hLastFloatTriggeredNode = NULL;
+	m_hLastHoverNode = nullptr;
+	m_hLastFloatTriggeredNode = nullptr;
 
 	HWND hWndFocus = GetFocus();
 	if(m_bMouseInControl)
@@ -1868,7 +1868,7 @@ void CSTXAnimatedTreeCtrlNS::OnMouseLeave()
 		if(hWndFocus != m_hwndControl)
 		{
 			if((GetStyle() & STXTVS_NO_EXPANDER_FADE) == 0)
-				ApplySmoothStopTransition(m_pAVExpanderOpacity, m_nDefaultAnimationDuration * 2, 0.0, NULL, TRUE);
+				ApplySmoothStopTransition(m_pAVExpanderOpacity, m_nDefaultAnimationDuration * 2, 0.0, nullptr, TRUE);
 		}
 	}
 }
@@ -1884,7 +1884,7 @@ void CSTXAnimatedTreeCtrlNS::OnKillFocus(HWND hWndNewFocus)
 	if(!m_bMouseInControl)
 	{
 		if((GetStyle() & STXTVS_NO_EXPANDER_FADE) == 0)
-			ApplySmoothStopTransition(m_pAVExpanderOpacity, m_nDefaultAnimationDuration * 2, 0.0, NULL, TRUE);
+			ApplySmoothStopTransition(m_pAVExpanderOpacity, m_nDefaultAnimationDuration * 2, 0.0, nullptr, TRUE);
 	}
 }
 
@@ -1907,16 +1907,16 @@ void CSTXAnimatedTreeCtrlNS::OnDestroy()
 	if (m_pDefaultFont)
 	{
 		delete m_pDefaultFont;
-		m_pDefaultFont = NULL;
+		m_pDefaultFont = nullptr;
 	}
 	if (m_pDefaultSubTextFont)
 	{
 		delete m_pDefaultSubTextFont;
-		m_pDefaultSubTextFont = NULL;
+		m_pDefaultSubTextFont = nullptr;
 	}
 
-	m_pImgWatermarkCached = NULL;
-	m_pImgWatermark = NULL;
+	m_pImgWatermarkCached = nullptr;
+	m_pImgWatermark = nullptr;
 }
 
 LRESULT CSTXAnimatedTreeCtrlNS::OnGetObject(DWORD dwFlags, DWORD dwObjId)
@@ -1934,12 +1934,12 @@ BOOL CSTXAnimatedTreeCtrlNS::OnSetCursor( HWND hWnd, UINT nHitTest, UINT message
 	POINT point;
 	GetCursorPos(&point);
 	ScreenToClient(m_hwndControl, &point);
-	HSTXTREENODE hNodeHover = Internal_NodeHitTest(point, NULL);
+	HSTXTREENODE hNodeHover = Internal_NodeHitTest(point, nullptr);
 	if(hNodeHover)
 	{
 		if(hNodeHover->m_dwItemStyle & STXTVIS_HANDCURSOR)
 		{
-			SetCursor(::LoadCursor(NULL, MAKEINTRESOURCE(IDC_HAND)));
+			SetCursor(::LoadCursor(nullptr, IDC_HAND));
 			return TRUE;
 		}
 	}
@@ -1999,7 +1999,7 @@ void CSTXAnimatedTreeCtrlNS::ResetScrollBars()
 	else
 	{
 		int iCurPos = GetScrollPos(m_hwndControl, SB_VERT);
-		//ScrollWindow(m_hwndControl, 0, iCurPos, NULL, NULL);
+		//ScrollWindow(m_hwndControl, 0, iCurPos, nullptr, nullptr);
 		SetScrollPos(m_hwndControl, SB_VERT, 0, TRUE);
 		::ShowScrollBar(m_hwndControl, SB_VERT, FALSE);
 		ModifyStyle(GWL_STYLE, WS_VSCROLL, 0, 0);
@@ -2008,7 +2008,7 @@ void CSTXAnimatedTreeCtrlNS::ResetScrollBars()
 	//Horizontal Scroll Bar
 	ResetHorizontalScrollBar();
 
-	InvalidateRect(m_hwndControl, NULL, FALSE);
+	InvalidateRect(m_hwndControl, nullptr, FALSE);
 }
 
 void CSTXAnimatedTreeCtrlNS::ResetHorizontalScrollBar()
@@ -2051,7 +2051,7 @@ void CSTXAnimatedTreeCtrlNS::ResetHorizontalScrollBar()
 	else
 	{
 		int iCurPos = GetScrollPos(m_hwndControl, SB_HORZ);
-		//ScrollWindow(m_hwndControl, 0, iCurPos, NULL, NULL);
+		//ScrollWindow(m_hwndControl, 0, iCurPos, nullptr, nullptr);
 		SetScrollPos(m_hwndControl, SB_HORZ, 0, TRUE);
 		::ShowScrollBar(m_hwndControl, SB_HORZ, FALSE);
 		ModifyStyle(GWL_STYLE, WS_HSCROLL, 0, 0);
@@ -2068,7 +2068,7 @@ BOOL CSTXAnimatedTreeCtrlNS::ModifyStyle(int nStyleOffset, DWORD dwRemove, DWORD
 	::SetWindowLong(m_hwndControl, nStyleOffset, dwNewStyle);
 	if (nFlags != 0)
 	{
-		::SetWindowPos(m_hwndControl, NULL, 0, 0, 0, 0,
+		::SetWindowPos(m_hwndControl, nullptr, 0, 0, 0, 0,
 			SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | nFlags);
 	}
 	return TRUE;
@@ -2076,11 +2076,11 @@ BOOL CSTXAnimatedTreeCtrlNS::ModifyStyle(int nStyleOffset, DWORD dwRemove, DWORD
 
 void CSTXAnimatedTreeCtrlNS::ModifyStyle( DWORD dwRemove, DWORD dwAdd )
 {
-	if(GetSafeHwnd() == NULL)
+	if(GetSafeHwnd() == nullptr)
 		return;
 
 	ModifyStyle(GWL_STYLE, dwRemove, dwAdd, 0);
-	InvalidateRect(m_hwndControl, NULL, FALSE);
+	InvalidateRect(m_hwndControl, nullptr, FALSE);
 }
 
 int CSTXAnimatedTreeCtrlNS::GetScrollLimit(int nBar)
@@ -2106,7 +2106,7 @@ HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_NodeHitTest(POINT pt, UINT *pFlags
 	pt.x += iHScrollPos;
 	pt.y += iVScrollPos;
 
-	HSTXTREENODE hNodeHit = NULL;
+	HSTXTREENODE hNodeHit = nullptr;
 
 	STXTREENODELIST::iterator it = m_arrRootNodes.begin();
 	for(;it!=m_arrRootNodes.end();it++)
@@ -2120,7 +2120,7 @@ HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_NodeHitTest(POINT pt, UINT *pFlags
 			return hNodeHit;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 HWND CSTXAnimatedTreeCtrlNS::GetSafeHwnd()
@@ -2130,7 +2130,7 @@ HWND CSTXAnimatedTreeCtrlNS::GetSafeHwnd()
 
 BOOL CSTXAnimatedTreeCtrlNS::Internal_Expand(HSTXTREENODE hNode, UINT nCode)
 {
-	if(hNode == NULL || hNode == STXTVI_ROOT || hNode == STXTVI_FIRST || hNode == STXTVI_LAST)
+	if(hNode == nullptr || hNode == STXTVI_ROOT || hNode == STXTVI_FIRST || hNode == STXTVI_LAST)
 		return FALSE;
 
 	int iActionToDo = STXATVE_NONE;
@@ -2200,7 +2200,7 @@ BOOL CSTXAnimatedTreeCtrlNS::Internal_Expand(HSTXTREENODE hNode, UINT nCode)
 	}
 
 	ResetScrollBars();
-	InvalidateRect(m_hwndControl, NULL, TRUE);
+	InvalidateRect(m_hwndControl, nullptr, TRUE);
 	return TRUE;
 }
 
@@ -2218,7 +2218,7 @@ BOOL CSTXAnimatedTreeCtrlNS::IsNeedApplyOffset(HSTXTREENODE hNode)
 
 void CSTXAnimatedTreeCtrlNS::SetAllChildrenOpacity( HSTXTREENODE hNode, DOUBLE fTargetOpacity )
 {
-	if(hNode == NULL || hNode == STXTVI_ROOT || hNode == STXTVI_FIRST || hNode == STXTVI_LAST)
+	if(hNode == nullptr || hNode == STXTVI_ROOT || hNode == STXTVI_FIRST || hNode == STXTVI_LAST)
 		return;
 
 	CComPtr<IUIAnimationStoryboard> pStory;
@@ -2233,12 +2233,12 @@ void CSTXAnimatedTreeCtrlNS::SetAllChildrenOpacity( HSTXTREENODE hNode, DOUBLE f
 		pStory->AddTransition((*it)->m_pAVOpacity, pTrans);
 	}
 
-	pStory->Schedule(GetCurrentTime(), NULL);
+	pStory->Schedule(GetCurrentTime(), nullptr);
 }
 
 void CSTXAnimatedTreeCtrlNS::AdjustSelection(HSTXTREENODE hNodeCollapsed)
 {
-	if(m_hSelectedNode == NULL)
+	if(m_hSelectedNode == nullptr)
 		return;
 
 	HSTXTREENODE hNodeTrace = m_hSelectedNode->m_pParentNode;
@@ -2267,33 +2267,33 @@ void CSTXAnimatedTreeCtrlNS::SelectNode( HSTXTREENODE hNode )
 			hNode->m_bSelected = TRUE;
 		}
 		SendCommonNotifyMessage(STXATVN_SELECTEDITEMCHANGED, hNode, 0);
-		InvalidateRect(m_hwndControl, NULL, TRUE);
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
 	}
 }
 
 HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_GetChildItem( HSTXTREENODE hItem )
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_SORT)
-		return NULL;
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_SORT)
+		return nullptr;
 
 	if(hItem == STXTVI_ROOT)
 	{
 		if(m_arrRootNodes.size() == 0)
-			return NULL;
+			return nullptr;
 
 		return m_arrRootNodes.front().get();
 	}
 
 	if(hItem->m_arrChildNodes.size() == 0)
-		return NULL;
+		return nullptr;
 
 	return hItem->m_arrChildNodes.front().get();
 }
 
 HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_GetNextItem( HSTXTREENODE hItem, UINT nCode )
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_SORT)
-		return NULL;
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_SORT)
+		return nullptr;
 
 	STXTREENODELIST *pNodeList;
 	if(hItem == STXTVI_ROOT)
@@ -2317,8 +2317,8 @@ HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_GetNextItem( HSTXTREENODE hItem, U
 	else if(nCode == STXATVGN_PARENT)
 	{
 		if(hItem == STXTVI_ROOT)
-			return NULL;
-		if(hItem->m_pParentNode == NULL)
+			return nullptr;
+		if(hItem->m_pParentNode == nullptr)
 			return STXTVI_ROOT;
 
 		return hItem->m_pParentNode;
@@ -2339,15 +2339,15 @@ HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_GetNextItem( HSTXTREENODE hItem, U
 	{
 		return m_hSelectedNode;
 	}
-	return NULL;
+	return nullptr;
 }
 
 BOOL CSTXAnimatedTreeCtrlNS::IsAscendant( HSTXTREENODE hNodeAscendant, HSTXTREENODE hNode )
 {
-	if(hNode == NULL || hNode == STXTVI_FIRST || hNode == STXTVI_LAST)
+	if(hNode == nullptr || hNode == STXTVI_FIRST || hNode == STXTVI_LAST)
 		return FALSE;
 
-	if(hNodeAscendant == NULL || hNodeAscendant == STXTVI_FIRST || hNodeAscendant == STXTVI_LAST)
+	if(hNodeAscendant == nullptr || hNodeAscendant == STXTVI_FIRST || hNodeAscendant == STXTVI_LAST)
 		return FALSE;
 
 	if(hNodeAscendant == STXTVI_ROOT)
@@ -2367,7 +2367,7 @@ BOOL CSTXAnimatedTreeCtrlNS::IsAscendant( HSTXTREENODE hNodeAscendant, HSTXTREEN
 
 BOOL CSTXAnimatedTreeCtrlNS::IsItemVisible( HSTXTREENODE hItem )
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
 		return FALSE;
 
 	hItem = hItem->m_pParentNode;
@@ -2384,13 +2384,13 @@ BOOL CSTXAnimatedTreeCtrlNS::IsItemVisible( HSTXTREENODE hItem )
 
 HSTXTREENODE CSTXAnimatedTreeCtrlNS::GetNearestVisibleAscendant( HSTXTREENODE hItem )
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
-		return NULL;
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
+		return nullptr;
 
 	//if all Ascendants are expanded, then get the parent directly
 	//else get the furthest collapsed Ascendant
 	HSTXTREENODE hItemCurrent = hItem->m_pParentNode;
-	HSTXTREENODE hItemCollapse = NULL;
+	HSTXTREENODE hItemCollapse = nullptr;
 	while(hItemCurrent)
 	{
 		if(!hItemCurrent->m_bExpanded)
@@ -2409,7 +2409,7 @@ HSTXTREENODE CSTXAnimatedTreeCtrlNS::GetSelectedItem()
 
 void CSTXAnimatedTreeCtrlNS::SelectNextVisibleItem()
 {
-	if(m_hSelectedNode == NULL && m_arrRootNodes.size() > 0)
+	if(m_hSelectedNode == nullptr && m_arrRootNodes.size() > 0)
 	{
 		HSTXTREENODE hNodeToSelect = (*m_arrRootNodes.begin()).get();
 		SelectNode(hNodeToSelect);
@@ -2427,7 +2427,7 @@ void CSTXAnimatedTreeCtrlNS::SelectNextVisibleItem()
 
 void CSTXAnimatedTreeCtrlNS::SelectPrevVisibleItem()
 {
-	if(m_hSelectedNode == NULL && m_arrRootNodes.size() > 0)
+	if(m_hSelectedNode == nullptr && m_arrRootNodes.size() > 0)
 	{
 		HSTXTREENODE hNodeToSelect = (*m_arrRootNodes.begin()).get();
 		SelectNode(hNodeToSelect);
@@ -2445,30 +2445,30 @@ void CSTXAnimatedTreeCtrlNS::SelectPrevVisibleItem()
 
 HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_GetNextSiblingItem(HSTXTREENODE hItem)
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_ROOT || hItem == STXTVI_SORT)
-		return NULL;
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_ROOT || hItem == STXTVI_SORT)
+		return nullptr;
 
 	STXTREENODELIST *pNodeList = &m_arrRootNodes;
-	if(hItem->m_pParentNode != NULL)
+	if(hItem->m_pParentNode != nullptr)
 		pNodeList = &hItem->m_pParentNode->m_arrChildNodes;
 
 	STXTREENODELIST::iterator it = hItem->m_itPositionInParent;
 	it++;
-	return it == pNodeList->end() ? NULL : (*it).get();
+	return it == pNodeList->end() ? nullptr : (*it).get();
 }
 
 HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_GetPrevSiblingItem( HSTXTREENODE hItem )
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
-		return NULL;
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
+		return nullptr;
 
 	STXTREENODELIST *pNodeList = &m_arrRootNodes;
-	if(hItem->m_pParentNode != NULL)
+	if(hItem->m_pParentNode != nullptr)
 		pNodeList = &hItem->m_pParentNode->m_arrChildNodes;
 
 	STXTREENODELIST::iterator it = hItem->m_itPositionInParent;
 	if(it == pNodeList->begin())
-		return NULL;
+		return nullptr;
 	
 	it--;
 	return (*it).get();
@@ -2491,7 +2491,7 @@ HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_GetPrevVisibleItem( HSTXTREENODE h
 		return hItemVisibleAscendant;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_GetNextVisibleItem( HSTXTREENODE hItem )
@@ -2512,7 +2512,7 @@ HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_GetNextVisibleItem( HSTXTREENODE h
 	}
 	HSTXTREENODE hItemNext = hItem;
 	hItemNext = Internal_GetNextItem(hItemCurrent, STXATVGN_NEXT);
-	while(hItemNext == NULL && hItemCurrent->m_pParentNode != NULL)
+	while(hItemNext == nullptr && hItemCurrent->m_pParentNode != nullptr)
 	{
 		hItemCurrent = hItemCurrent->m_pParentNode;
 		hItemNext = Internal_GetNextItem(hItemCurrent, STXATVGN_NEXT);
@@ -2522,7 +2522,7 @@ HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_GetNextVisibleItem( HSTXTREENODE h
 
 DOUBLE CSTXAnimatedTreeCtrlNS::GetItemTopOffsetAbsolute( HSTXTREENODE hItem )
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
 		return 0.0;
 
 	DOUBLE fOffset = 0;
@@ -2545,7 +2545,7 @@ DOUBLE CSTXAnimatedTreeCtrlNS::GetItemTopOffsetAbsolute( HSTXTREENODE hItem )
 
 BOOL CSTXAnimatedTreeCtrlNS::Internal_EnsureVisible( HSTXTREENODE hItem )
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
 		return FALSE;
 
 	DOUBLE fItemHeightFinal = 0.0;
@@ -2592,8 +2592,8 @@ BOOL CSTXAnimatedTreeCtrlNS::Internal_EnsureVisible( HSTXTREENODE hItem )
 
 HSTXTREENODE CSTXAnimatedTreeCtrlNS::GetFurthestVisibleItem( HSTXTREENODE hItem )
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
-		return NULL;
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
+		return nullptr;
 
 	while(hItem && hItem->m_bExpanded && hItem->m_arrChildNodes.size() > 0)
 	{
@@ -2603,25 +2603,25 @@ HSTXTREENODE CSTXAnimatedTreeCtrlNS::GetFurthestVisibleItem( HSTXTREENODE hItem 
 }
 
 
-std::tr1::shared_ptr<Gdiplus::Image> CSTXAnimatedTreeCtrlNS::GetResizedImage( IStream *pStream, int nWidthHeight )
+std::shared_ptr<Gdiplus::Image> CSTXAnimatedTreeCtrlNS::GetResizedImage( IStream *pStream, int nWidthHeight )
 {
-	std::tr1::shared_ptr<Gdiplus::Image> img(new Gdiplus::Bitmap(pStream));
+	std::shared_ptr<Gdiplus::Image> img(new Gdiplus::Bitmap(pStream));
 	return GetResizedImage(img, nWidthHeight);
 }
 
-std::tr1::shared_ptr<Gdiplus::Image> CSTXAnimatedTreeCtrlNS::GetResizedImage( HBITMAP hBitmap, int nWidthHeight )
+std::shared_ptr<Gdiplus::Image> CSTXAnimatedTreeCtrlNS::GetResizedImage( HBITMAP hBitmap, int nWidthHeight )
 {
-	std::tr1::shared_ptr<Gdiplus::Image> img(new Gdiplus::Bitmap(hBitmap, NULL));
+	std::shared_ptr<Gdiplus::Image> img(new Gdiplus::Bitmap(hBitmap, nullptr));
 	return GetResizedImage(img, nWidthHeight);
 }
 
-std::tr1::shared_ptr<Gdiplus::Image> CSTXAnimatedTreeCtrlNS::GetResizedImage( LPCTSTR lpszFile, int nWidthHeight )
+std::shared_ptr<Gdiplus::Image> CSTXAnimatedTreeCtrlNS::GetResizedImage( LPCTSTR lpszFile, int nWidthHeight )
 {
-	std::tr1::shared_ptr<Gdiplus::Image> img(new Gdiplus::Image(lpszFile));
+	std::shared_ptr<Gdiplus::Image> img(new Gdiplus::Image(lpszFile));
 	return GetResizedImage(img, nWidthHeight);
 }
 
-std::tr1::shared_ptr<Gdiplus::Image> CSTXAnimatedTreeCtrlNS::GetResizedImage( std::tr1::shared_ptr<Gdiplus::Image> pImage, int nWidthHeight )
+std::shared_ptr<Gdiplus::Image> CSTXAnimatedTreeCtrlNS::GetResizedImage( std::shared_ptr<Gdiplus::Image> pImage, int nWidthHeight )
 {
 	UINT o_height = pImage->GetHeight();
 	UINT o_width = pImage->GetWidth();
@@ -2641,7 +2641,7 @@ std::tr1::shared_ptr<Gdiplus::Image> CSTXAnimatedTreeCtrlNS::GetResizedImage( st
 			n_width = static_cast<UINT>(n_height * ratio);
 		}
 
-		std::tr1::shared_ptr<Gdiplus::Image> imgThumbnail(pImage->GetThumbnailImage(n_width, n_height));
+		std::shared_ptr<Gdiplus::Image> imgThumbnail(pImage->GetThumbnailImage(n_width, n_height));
 		return imgThumbnail;
 	}
 	else
@@ -2652,7 +2652,7 @@ std::tr1::shared_ptr<Gdiplus::Image> CSTXAnimatedTreeCtrlNS::GetResizedImage( st
 
 BOOL CSTXAnimatedTreeCtrlNS::SetItemImage(HSTXTREENODE hItem, IStream *pStream, BOOL bResizeImage)
 {
-	if (hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
+	if (hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
 		return FALSE;
 
 	DOUBLE fItemHeightFinal = 0.0;
@@ -2662,7 +2662,7 @@ BOOL CSTXAnimatedTreeCtrlNS::SetItemImage(HSTXTREENODE hItem, IStream *pStream, 
 	{
 		nResizeImageWidth = static_cast<int>(fItemHeightFinal);
 	}
-	std::tr1::shared_ptr<Gdiplus::Image> pImg = GetResizedImage(pStream, nResizeImageWidth);
+	std::shared_ptr<Gdiplus::Image> pImg = GetResizedImage(pStream, nResizeImageWidth);
 	if(pImg && pImg->GetWidth() == 0)
 		pImg.reset();
 
@@ -2690,7 +2690,7 @@ BOOL CSTXAnimatedTreeCtrlNS::SetItemImage(HSTXTREENODE hItem, IStream *pStream, 
 		pTransImageSize->SetInitialVelocity(0.0);
 		pStory->AddTransition(hItem->m_pAVImageOccupy, pTransImageSize);
 
-		pStory->Schedule(GetCurrentTime(), NULL);
+		pStory->Schedule(GetCurrentTime(), nullptr);
 	}
 	else
 	{
@@ -2709,22 +2709,22 @@ BOOL CSTXAnimatedTreeCtrlNS::SetItemImage(HSTXTREENODE hItem, IStream *pStream, 
 		m_AnimationTransitionLibrary->CreateSmoothStopTransition(m_nDefaultAnimationDuration / 1.0, 0, &pTransImageSize);
 		pStory->AddTransition(hItem->m_pAVImageOccupy, pTransImageSize);
 
-		pStory->Schedule(GetCurrentTime(), NULL);
-		hItem->m_pImgImage = std::tr1::shared_ptr<Gdiplus::Image>();		//NULL
+		pStory->Schedule(GetCurrentTime(), nullptr);
+		hItem->m_pImgImage = std::shared_ptr<Gdiplus::Image>();		//nullptr
 	}
 
 	hItem->m_nBoundsMaxX = -1;
 	ResetHorizontalScrollBar();
 
 	if(GetSafeHwnd() && IsItemVisible(hItem))
-		InvalidateRect(m_hwndControl, NULL, TRUE);
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
 
 	return TRUE;
 }
 
 void CSTXAnimatedTreeCtrlNS::SetItemImageCallback(HSTXTREENODE hItem, BOOL bUseImageCallback)
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_ROOT || hItem == STXTVI_SORT)
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_ROOT || hItem == STXTVI_SORT)
 		return;
 
 	DOUBLE fItemHeightFinal = 0.0;
@@ -2749,7 +2749,7 @@ void CSTXAnimatedTreeCtrlNS::SetItemImageCallback(HSTXTREENODE hItem, BOOL bUseI
 		pTransImageSize->SetInitialVelocity(0.0);
 		pStory->AddTransition(hItem->m_pAVImageOccupy, pTransImageSize);
 
-		pStory->Schedule(GetCurrentTime(), NULL);
+		pStory->Schedule(GetCurrentTime(), nullptr);
 	}
 	else
 	{
@@ -2766,20 +2766,20 @@ void CSTXAnimatedTreeCtrlNS::SetItemImageCallback(HSTXTREENODE hItem, BOOL bUseI
 		m_AnimationTransitionLibrary->CreateSmoothStopTransition(m_nDefaultAnimationDuration / 1.0, 0, &pTransImageSize);
 		pStory->AddTransition(hItem->m_pAVImageOccupy, pTransImageSize);
 
-		pStory->Schedule(GetCurrentTime(), NULL);
+		pStory->Schedule(GetCurrentTime(), nullptr);
 	}
 }
 
 
 BOOL CSTXAnimatedTreeCtrlNS::SetItemSubImage( HSTXTREENODE hItem, IStream *pStream )
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
 		return FALSE;
 
 	//DOUBLE fItemHeightFinal = 0.0;
 	//hItem->m_pAVItemHeight->GetFinalValue(&fItemHeightFinal);
-	//std::tr1::shared_ptr<Gdiplus::Image> pImg = GetResizedImage(pStream, fItemHeightFinal);
-	std::tr1::shared_ptr<Gdiplus::Image> pImg = GetResizedImage(pStream, -1);		//Use original image
+	//std::shared_ptr<Gdiplus::Image> pImg = GetResizedImage(pStream, fItemHeightFinal);
+	std::shared_ptr<Gdiplus::Image> pImg = GetResizedImage(pStream, -1);		//Use original image
 	if(pImg && pImg->GetWidth() == 0)
 		pImg.reset();
 
@@ -2787,17 +2787,17 @@ BOOL CSTXAnimatedTreeCtrlNS::SetItemSubImage( HSTXTREENODE hItem, IStream *pStre
 	hItem->m_dwItemStyle &= (~STXTVIS_SUB_TEXT);
 
 	if(GetSafeHwnd() && IsItemVisible(hItem))
-		InvalidateRect(m_hwndControl, NULL, TRUE);
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
 
 	return TRUE;
 }
 
 void CSTXAnimatedTreeCtrlNS::SetItemSubImage( HSTXTREENODE hItem, LPCTSTR lpszImageFile )
 {
-	if(lpszImageFile == NULL)
+	if(lpszImageFile == nullptr)
 		return;
 
-	IStream *pStream = NULL;
+	IStream *pStream = nullptr;
 	SHCreateStreamOnFile(lpszImageFile, STGM_READ|STGM_SHARE_DENY_WRITE, &pStream);
 	if(pStream)
 	{
@@ -2808,10 +2808,10 @@ void CSTXAnimatedTreeCtrlNS::SetItemSubImage( HSTXTREENODE hItem, LPCTSTR lpszIm
 
 void CSTXAnimatedTreeCtrlNS::SetItemImage(HSTXTREENODE hItem, LPCTSTR lpszImageFile, BOOL bResizeImage)
 {
-	if(lpszImageFile == NULL)
+	if(lpszImageFile == nullptr)
 		return;
 
-	IStream *pStream = NULL;
+	IStream *pStream = nullptr;
 	SHCreateStreamOnFile(lpszImageFile, STGM_READ|STGM_SHARE_DENY_WRITE, &pStream);
 	if(pStream)
 	{
@@ -2822,11 +2822,11 @@ void CSTXAnimatedTreeCtrlNS::SetItemImage(HSTXTREENODE hItem, LPCTSTR lpszImageF
 
 BOOL CSTXAnimatedTreeCtrlNS::Internal_DeleteItem(HSTXTREENODE hItem)
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
 		return FALSE;
 
 	STXTREENODELIST *pListToDeleteFrom = &m_arrRootNodes;
-	std::queue<std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> > *pDeleteQueue = &m_queDeletedNodes;
+	std::queue<std::shared_ptr<CSTXAnimatedTreeNodeNS> > *pDeleteQueue = &m_queDeletedNodes;
 
 	HSTXTREENODE originalSelectedNode = m_hSelectedNode;
 
@@ -2846,7 +2846,7 @@ BOOL CSTXAnimatedTreeCtrlNS::Internal_DeleteItem(HSTXTREENODE hItem)
 		STXTREENODELIST::iterator it = m_arrRootNodes.begin();
 		for(;it!=m_arrRootNodes.end();it++)
 		{
-			std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> spItemToDelete = (*it);
+			std::shared_ptr<CSTXAnimatedTreeNodeNS> spItemToDelete = (*it);
 
 			//Opacity
 			ApplySmoothStopTransition(spItemToDelete->m_pAVOpacity, m_nDefaultAnimationDuration / 2, 0.0, pStory);
@@ -2871,19 +2871,19 @@ BOOL CSTXAnimatedTreeCtrlNS::Internal_DeleteItem(HSTXTREENODE hItem)
 
 			if(spItemToDelete->m_bSelected && m_hSelectedNode)
 			{
-				m_hSelectedNode = NULL;
+				m_hSelectedNode = nullptr;
 				//No need to set spItemToDelete->m_bSelected to FALSE.
 			}
 			m_queDeletedNodes.push(spItemToDelete);
 
 		}
 		m_arrRootNodes.clear();
-		pStory->Schedule(GetCurrentTime(), NULL);
+		pStory->Schedule(GetCurrentTime(), nullptr);
 		ResetScrollBars();
-		m_hSelectedNode = NULL;
+		m_hSelectedNode = nullptr;
 
 		if(GetSafeHwnd() && !IsAnimationBusy())
-			InvalidateRect(m_hwndControl, NULL, TRUE);
+			InvalidateRect(m_hwndControl, nullptr, TRUE);
 	}
 	else
 	{
@@ -2910,7 +2910,7 @@ BOOL CSTXAnimatedTreeCtrlNS::Internal_DeleteItem(HSTXTREENODE hItem)
 
 		ApplyOffsetAfter(pListToDeleteFrom, hItem, -fItemHeight, hItem, TRUE);
 
-		std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> spItemToDelete = (*hItem->m_itPositionInParent);
+		std::shared_ptr<CSTXAnimatedTreeNodeNS> spItemToDelete = (*hItem->m_itPositionInParent);
 
 		CComPtr<IUIAnimationStoryboard> pStory;
 		m_AnimationManager->CreateStoryboard(&pStory);
@@ -2929,15 +2929,15 @@ BOOL CSTXAnimatedTreeCtrlNS::Internal_DeleteItem(HSTXTREENODE hItem)
 
 		if(spItemToDelete->m_bSelected && m_hSelectedNode)
 		{
-			m_hSelectedNode = NULL;
+			m_hSelectedNode = nullptr;
 			//No need to set spItemToDelete->m_bSelected to FALSE.
 		}
 		pDeleteQueue->push(spItemToDelete);
 
-		pStory->Schedule(GetCurrentTime(), NULL);
+		pStory->Schedule(GetCurrentTime(), nullptr);
 
 		ResetScrollBars();
-		InvalidateRect(m_hwndControl, NULL, TRUE);
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
 
 	}
 
@@ -2961,9 +2961,9 @@ void CSTXAnimatedTreeCtrlNS::ApplySmoothStopTransition(IUIAnimationVariable *pVa
 		pTrans->SetInitialVelocity(0.0);
 	pStory->AddTransition(pVar, pTrans);
 
-	if(pStoryboard == NULL)
+	if(pStoryboard == nullptr)
 	{
-		pStory->Schedule(GetCurrentTime(), NULL);
+		pStory->Schedule(GetCurrentTime(), nullptr);
 	}
 }
 
@@ -2986,7 +2986,7 @@ void CSTXAnimatedTreeCtrlNS::CheckDrag(int x, int y)
 			else
 				iNewHighLightValue = 2;		//After
 
-			if(m_hDragOverNode == NULL || hNode->m_iDropHighlight != iNewHighLightValue)
+			if(m_hDragOverNode == nullptr || hNode->m_iDropHighlight != iNewHighLightValue)
 			{
 				if(m_hDragOverNode)
 					m_hDragOverNode->m_iDropHighlight = 0;
@@ -2994,7 +2994,7 @@ void CSTXAnimatedTreeCtrlNS::CheckDrag(int x, int y)
 				m_hDragOverNode = hNode;
 
 				hNode->m_iDropHighlight = iNewHighLightValue;
-				InvalidateRect(m_hwndControl, NULL, TRUE);
+				InvalidateRect(m_hwndControl, nullptr, TRUE);
 				m_hDragOverNode = hNode;
 			}
 		}
@@ -3003,21 +3003,21 @@ void CSTXAnimatedTreeCtrlNS::CheckDrag(int x, int y)
 			//Check whether the mouse is at the bottom
 			if(bInBottomSpace)
 			{
-				std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> pLastRootNode = m_arrRootNodes.back();
+				std::shared_ptr<CSTXAnimatedTreeNodeNS> pLastRootNode = m_arrRootNodes.back();
 				HSTXTREENODE hNodeBottomNode = GetFurthestVisibleItem(pLastRootNode.get());
 
 				if(m_hDragOverNode && m_hDragOverNode->m_iDropHighlight != 2)
 				{
 					hNodeBottomNode->m_iDropHighlight = 2;	//After
 					m_hDragOverNode = hNodeBottomNode;
-					InvalidateRect(m_hwndControl, NULL, TRUE);
+					InvalidateRect(m_hwndControl, nullptr, TRUE);
 				}
 			}
 			else if(m_hDragOverNode)
 			{
 				m_hDragOverNode->m_iDropHighlight = 0;
-				InvalidateRect(m_hwndControl, NULL, TRUE);
-				m_hDragOverNode = NULL;
+				InvalidateRect(m_hwndControl, nullptr, TRUE);
+				m_hDragOverNode = nullptr;
 			}
 		}
 	}
@@ -3049,7 +3049,7 @@ BOOL CSTXAnimatedTreeCtrlNS::IsMouseInButtomSpace(int x, int y)
 	if(y > 20000)		// < 0
 		return FALSE;
 
-	std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> pLastRootNode = m_arrRootNodes.back();
+	std::shared_ptr<CSTXAnimatedTreeNodeNS> pLastRootNode = m_arrRootNodes.back();
 	DOUBLE fLastNodeTop = 0;
 	pLastRootNode->m_pAVTopOffset->GetValue(&fLastNodeTop);
 
@@ -3061,7 +3061,7 @@ BOOL CSTXAnimatedTreeCtrlNS::IsMouseInButtomSpace(int x, int y)
 
 void CSTXAnimatedTreeCtrlNS::OnDrop(HSTXTREENODE hNodeDropTo)
 {
-	//std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> pItemToMove = *m_hSelectedNode->m_itPositionInParent;
+	//std::shared_ptr<CSTXAnimatedTreeNodeNS> pItemToMove = *m_hSelectedNode->m_itPositionInParent;
 
 	//if(hNodeDropTo->m_iDropHighlight == 1)
 	//{
@@ -3081,7 +3081,7 @@ void CSTXAnimatedTreeCtrlNS::OnDrop(HSTXTREENODE hNodeDropTo)
 
 int CSTXAnimatedTreeCtrlNS::GetAllVisibleItem( HSTXTREENODE hSearchRoot /*= STXTVI_ROOT*/, std::vector<HSTXTREENODE> *pArrItems )
 {
-	if(pArrItems == NULL)
+	if(pArrItems == nullptr)
 		return 0;
 
 	if(hSearchRoot == STXTVI_ROOT)
@@ -3089,7 +3089,7 @@ int CSTXAnimatedTreeCtrlNS::GetAllVisibleItem( HSTXTREENODE hSearchRoot /*= STXT
 		STXTREENODELIST::iterator it = m_arrRootNodes.begin();
 		for(;it!=m_arrRootNodes.end();it++)
 		{
-			std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> spItem = (*it);
+			std::shared_ptr<CSTXAnimatedTreeNodeNS> spItem = (*it);
 			GetAllVisibleItem(spItem.get(), pArrItems);
 		}
 	}
@@ -3101,7 +3101,7 @@ int CSTXAnimatedTreeCtrlNS::GetAllVisibleItem( HSTXTREENODE hSearchRoot /*= STXT
 			STXTREENODELIST::iterator it = hSearchRoot->m_arrChildNodes.begin();
 			for(;it!=hSearchRoot->m_arrChildNodes.end();it++)
 			{
-				std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> spItem = (*it);
+				std::shared_ptr<CSTXAnimatedTreeNodeNS> spItem = (*it);
 				GetAllVisibleItem(spItem.get(), pArrItems);
 			}
 		}
@@ -3112,7 +3112,7 @@ int CSTXAnimatedTreeCtrlNS::GetAllVisibleItem( HSTXTREENODE hSearchRoot /*= STXT
 
 int CSTXAnimatedTreeCtrlNS::GetAllItem( HSTXTREENODE hSearchRoot /*= STXTVI_ROOT*/, std::vector<HSTXTREENODE> *pArrItems )
 {
-	if(pArrItems == NULL)
+	if(pArrItems == nullptr)
 		return 0;
 
 	if(hSearchRoot == STXTVI_ROOT)
@@ -3120,7 +3120,7 @@ int CSTXAnimatedTreeCtrlNS::GetAllItem( HSTXTREENODE hSearchRoot /*= STXTVI_ROOT
 		STXTREENODELIST::iterator it = m_arrRootNodes.begin();
 		for(;it!=m_arrRootNodes.end();it++)
 		{
-			std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> spItem = (*it);
+			std::shared_ptr<CSTXAnimatedTreeNodeNS> spItem = (*it);
 			GetAllItem(spItem.get(), pArrItems);
 		}
 	}
@@ -3130,7 +3130,7 @@ int CSTXAnimatedTreeCtrlNS::GetAllItem( HSTXTREENODE hSearchRoot /*= STXTVI_ROOT
 		STXTREENODELIST::iterator it = hSearchRoot->m_arrChildNodes.begin();
 		for(;it!=hSearchRoot->m_arrChildNodes.end();it++)
 		{
-			std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> spItem = (*it);
+			std::shared_ptr<CSTXAnimatedTreeNodeNS> spItem = (*it);
 			GetAllItem(spItem.get(), pArrItems);
 		}
 	}
@@ -3146,7 +3146,7 @@ int CSTXAnimatedTreeCtrlNS::GetItemCount( HSTXTREENODE hSearchRoot /*= STXTVI_RO
 		STXTREENODELIST::iterator it = m_arrRootNodes.begin();
 		for(;it!=m_arrRootNodes.end();it++)
 		{
-			std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> spItem = (*it);
+			std::shared_ptr<CSTXAnimatedTreeNodeNS> spItem = (*it);
 			nCount++;
 			nCount += GetItemCount(spItem.get());
 		}
@@ -3156,7 +3156,7 @@ int CSTXAnimatedTreeCtrlNS::GetItemCount( HSTXTREENODE hSearchRoot /*= STXTVI_RO
 		STXTREENODELIST::iterator it = hSearchRoot->m_arrChildNodes.begin();
 		for(;it!=hSearchRoot->m_arrChildNodes.end();it++)
 		{
-			std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> spItem = (*it);
+			std::shared_ptr<CSTXAnimatedTreeNodeNS> spItem = (*it);
 			nCount++;
 			nCount += GetItemCount(spItem.get());
 		}
@@ -3167,7 +3167,7 @@ int CSTXAnimatedTreeCtrlNS::GetItemCount( HSTXTREENODE hSearchRoot /*= STXTVI_RO
 
 BOOL CSTXAnimatedTreeCtrlNS::Internal_SetItemHeight( HSTXTREENODE hItem, int iHeight )
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
 		return FALSE;
 
 	DOUBLE fItemHeightFinal = 0.0;
@@ -3193,7 +3193,7 @@ BOOL CSTXAnimatedTreeCtrlNS::Internal_SetItemHeight( HSTXTREENODE hItem, int iHe
 	return TRUE;
 }
 
-bool CSTXAnimatedTreeCtrlNS::STXAnimatedTreeDefaultSortFuncWrapper(std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> pNode1, std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> pNode2)
+bool CSTXAnimatedTreeCtrlNS::STXAnimatedTreeDefaultSortFuncWrapper(std::shared_ptr<CSTXAnimatedTreeNodeNS> pNode1, std::shared_ptr<CSTXAnimatedTreeNodeNS> pNode2)
 {
 	if(s_sortStructure.nSortType == 1)
 		return s_sortStructure.pfnSort(pNode1->m_dwNodeData, pNode2->m_dwNodeData, s_sortStructure.lParamSort) < 0;
@@ -3203,7 +3203,7 @@ bool CSTXAnimatedTreeCtrlNS::STXAnimatedTreeDefaultSortFuncWrapper(std::tr1::sha
 
 BOOL CSTXAnimatedTreeCtrlNS::Internal_SortChildren( HSTXTREENODE hItem, std::function<int(LPARAM, LPARAM, LPARAM)> pfnSortFunc, LPARAM lParamSort )
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
 		return FALSE;
 
 	STXTREENODELIST *pListToAddIn = &m_arrRootNodes;
@@ -3228,7 +3228,7 @@ BOOL CSTXAnimatedTreeCtrlNS::Internal_SortChildren( HSTXTREENODE hItem, std::fun
 
 BOOL CSTXAnimatedTreeCtrlNS::Internal_SortChildrenByItem( HSTXTREENODE hItem, std::function<int(HSTXTREENODE, HSTXTREENODE, LPARAM)> pfnSortFunc, LPARAM lParamSort )
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
 		return FALSE;
 
 	STXTREENODELIST *pListToAddIn = &m_arrRootNodes;
@@ -3254,10 +3254,10 @@ BOOL CSTXAnimatedTreeCtrlNS::Internal_SortChildrenByItem( HSTXTREENODE hItem, st
 
 int CSTXAnimatedTreeCtrlNS::Internal_GetItemText( HSTXTREENODE hItem, LPTSTR pszTextBuffer, int cchBufferLen )
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_SORT)
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_SORT)
 		return FALSE;
 
-	if(pszTextBuffer == NULL)
+	if(pszTextBuffer == nullptr)
 		return hItem->m_strText.size();
 
 	_tcscpy_s(pszTextBuffer, cchBufferLen, hItem->m_strText.c_str());
@@ -3266,13 +3266,13 @@ int CSTXAnimatedTreeCtrlNS::Internal_GetItemText( HSTXTREENODE hItem, LPTSTR psz
 
 DWORD_PTR CSTXAnimatedTreeCtrlNS::Internal_GetItemData( HSTXTREENODE hItem )
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_SORT)
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_SORT)
 		return 0;
 
 	return hItem->m_dwNodeData;
 }
 
-void CSTXAnimatedTreeCtrlNS::RecalculateItemOffset( std::list<std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> > * pList )
+void CSTXAnimatedTreeCtrlNS::RecalculateItemOffset( std::list<std::shared_ptr<CSTXAnimatedTreeNodeNS> > * pList )
 {
 	STXTREENODELIST::iterator it = pList->begin();
 	INT_PTR iIndexBase = 0;
@@ -3282,20 +3282,20 @@ void CSTXAnimatedTreeCtrlNS::RecalculateItemOffset( std::list<std::tr1::shared_p
 
 	for(;it!=pList->end();it++)
 	{
-		std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> pItem = (*it);
+		std::shared_ptr<CSTXAnimatedTreeNodeNS> pItem = (*it);
 		ApplySmoothStopTransition(pItem->m_pAVTopOffset, m_nDefaultAnimationDuration / 2.0, iOffset, pStory);
 		iOffset += static_cast<int>(pItem->GetFinalHeight());
 	}
-	pStory->Schedule(GetCurrentTime(), NULL);
+	pStory->Schedule(GetCurrentTime(), nullptr);
 }
 
 HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_FindItem( HSTXTREENODE hItem, STXAnimatedTreeSearchCompareFuncType pfnSearchFunc, LPARAM lParamSearch )
 {
 	HSTXTREENODE hCurrent = Internal_GetNextItem(hItem, STXATVGN_CHILD);
-	if(pfnSearchFunc == NULL)
+	if(pfnSearchFunc == nullptr)
 		return hCurrent;
 
-	while (hCurrent != NULL) 
+	while (hCurrent != nullptr) 
 	{
 		DWORD_PTR dwItemData = Internal_GetItemData(hCurrent);
 		if(pfnSearchFunc(dwItemData, lParamSearch) == 0)
@@ -3311,7 +3311,7 @@ HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_FindItem( HSTXTREENODE hItem, STXA
 		// Try to get the next item
 		hCurrent = Internal_GetNextSiblingItem(hCurrent);
 	}
-	return NULL;
+	return nullptr;
 }
 
 int CSTXAnimatedTreeCtrlNS::Internal_FindItems( HSTXTREENODE hItem, STXAnimatedTreeSearchCompareFuncType pfnSearchFunc, LPARAM lParamSearch, HSTXTREENODE *pOutBuffer, int nBufferSize )
@@ -3319,10 +3319,10 @@ int CSTXAnimatedTreeCtrlNS::Internal_FindItems( HSTXTREENODE hItem, STXAnimatedT
 	int nCountFound = 0;
 	HSTXTREENODE hCurrent = Internal_GetNextItem(hItem, STXATVGN_CHILD);
 
-	while (hCurrent != NULL && (pOutBuffer == NULL || nBufferSize > 0)) 
+	while (hCurrent != nullptr && (pOutBuffer == nullptr || nBufferSize > 0)) 
 	{
 		DWORD_PTR dwItemData = Internal_GetItemData(hCurrent);
-		if(pfnSearchFunc == NULL || pfnSearchFunc(dwItemData, lParamSearch) == 0)
+		if(pfnSearchFunc == nullptr || pfnSearchFunc(dwItemData, lParamSearch) == 0)
 		{
 			if(pOutBuffer)
 			{
@@ -3353,7 +3353,7 @@ int CSTXAnimatedTreeCtrlNS::Internal_FindItems( HSTXTREENODE hItem, STXAnimatedT
 
 BOOL CSTXAnimatedTreeCtrlNS::Internal_SetItemData( HSTXTREENODE hItem, DWORD_PTR dwItemData )
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_SORT)
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_SORT)
 		return FALSE;
 
 	hItem->m_dwNodeData = dwItemData;
@@ -3362,7 +3362,7 @@ BOOL CSTXAnimatedTreeCtrlNS::Internal_SetItemData( HSTXTREENODE hItem, DWORD_PTR
 
 BOOL CSTXAnimatedTreeCtrlNS::Internal_ItemHasChildren( HSTXTREENODE hItem )
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_SORT)
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_SORT)
 		return FALSE;
 
 	if(hItem == STXTVI_ROOT)
@@ -3390,7 +3390,7 @@ void CSTXAnimatedTreeCtrlNS::OnInternalItemPostDelete( CSTXAnimatedTreeNodeNS* p
 
 int CSTXAnimatedTreeCtrlNS::GetDescendantItems( HSTXTREENODE hItem, std::vector<HSTXTREENODE> *pArrItems )
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_SORT)
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_SORT)
 		return 0;
 
 	STXTREENODELIST *pListToAddIn = &m_arrRootNodes;
@@ -3400,7 +3400,7 @@ int CSTXAnimatedTreeCtrlNS::GetDescendantItems( HSTXTREENODE hItem, std::vector<
 	if(pListToAddIn->size() == 0)
 		return 0;
 
-	std::list<std::tr1::shared_ptr<CSTXAnimatedTreeNodeNS> >::iterator it = pListToAddIn->begin();
+	std::list<std::shared_ptr<CSTXAnimatedTreeNodeNS> >::iterator it = pListToAddIn->begin();
 	for(;it!=pListToAddIn->end();it++)
 	{
 		pArrItems->push_back((*it).get());
@@ -3420,22 +3420,22 @@ BOOL CSTXAnimatedTreeCtrlNS::IsValidItem( HSTXTREENODE hItem )
 
 BOOL CSTXAnimatedTreeCtrlNS::Internal_SetBackgroundImage( IStream *pImgStream )
 {
-	m_pImgBackgroundCached = std::tr1::shared_ptr<Gdiplus::CachedBitmap>(); //Clear cache;
-	std::tr1::shared_ptr<Gdiplus::Image> img(new Gdiplus::Image(pImgStream));
+	m_pImgBackgroundCached = std::shared_ptr<Gdiplus::CachedBitmap>(); //Clear cache;
+	std::shared_ptr<Gdiplus::Image> img(new Gdiplus::Image(pImgStream));
 	m_pImgBackground = img;
 	if(GetSafeHwnd())
-		InvalidateRect(m_hwndControl, NULL, TRUE);
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
 
 	return TRUE;
 }
 
 BOOL CSTXAnimatedTreeCtrlNS::Internal_SetWatermarkImage( IStream *pImgStream )
 {
-	m_pImgWatermarkCached = std::tr1::shared_ptr<Gdiplus::CachedBitmap>(); //Clear cache;
-	std::tr1::shared_ptr<Gdiplus::Image> img(new Gdiplus::Image(pImgStream));
+	m_pImgWatermarkCached = std::shared_ptr<Gdiplus::CachedBitmap>(); //Clear cache;
+	std::shared_ptr<Gdiplus::Image> img(new Gdiplus::Image(pImgStream));
 	m_pImgWatermark = img;
 	if(GetSafeHwnd())
-		InvalidateRect(m_hwndControl, NULL, TRUE);
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
 
 	return TRUE;
 }
@@ -3454,14 +3454,14 @@ DWORD CSTXAnimatedTreeCtrlNS::GetStyle()
 
 BOOL CSTXAnimatedTreeCtrlNS::Internal_SetExpanderImage( IStream *pImgStreamExpanded, IStream *pImgStreamCollapsed )
 {
-	std::tr1::shared_ptr<Gdiplus::Image> imgExpanded(new Gdiplus::Image(pImgStreamExpanded));
+	std::shared_ptr<Gdiplus::Image> imgExpanded(new Gdiplus::Image(pImgStreamExpanded));
 	m_pImgExpanderExpanded = imgExpanded;
 
-	std::tr1::shared_ptr<Gdiplus::Image> imgCollapsed(new Gdiplus::Image(pImgStreamCollapsed));
+	std::shared_ptr<Gdiplus::Image> imgCollapsed(new Gdiplus::Image(pImgStreamCollapsed));
 	m_pImgExpanderCollapsed = imgCollapsed;
 
 	if(GetSafeHwnd())
-		InvalidateRect(m_hwndControl, NULL, TRUE);
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
 
 	return TRUE;
 }
@@ -3488,7 +3488,7 @@ STDMETHODIMP CSTXAnimatedTreeCtrlNS::accHitTest(long xLeft, long yTop, __out VAR
 	VariantInit(pvarChildAtPoint);
 	POINT ptLocal = {xLeft, yTop};
 	ScreenToClient(m_hwndControl, &ptLocal);
-	HSTXTREENODE hNode = Internal_NodeHitTest(ptLocal, NULL);
+	HSTXTREENODE hNode = Internal_NodeHitTest(ptLocal, nullptr);
 	if(hNode)
 	{
 		hr = InitVariantFromInt32(hNode->m_nAccID, pvarChildAtPoint);
@@ -3641,7 +3641,7 @@ IFACEMETHODIMP CSTXAnimatedTreeCtrlNS::accNavigate( long navDir, VARIANT varStar
 	case NAVDIR_LEFT:
 		{
 			HSTXTREENODE hNode = GetSelectedItem();
-			if(hNode == NULL)
+			if(hNode == nullptr)
 				return DISP_E_MEMBERNOTFOUND;
 
 			OnKeyDown_Left();
@@ -3652,7 +3652,7 @@ IFACEMETHODIMP CSTXAnimatedTreeCtrlNS::accNavigate( long navDir, VARIANT varStar
 	case NAVDIR_RIGHT:
 		{
 			HSTXTREENODE hNode = GetSelectedItem();
-			if(hNode == NULL)
+			if(hNode == nullptr)
 				return DISP_E_MEMBERNOTFOUND;
 
 			OnKeyDown_Right();
@@ -3668,7 +3668,7 @@ IFACEMETHODIMP CSTXAnimatedTreeCtrlNS::accNavigate( long navDir, VARIANT varStar
 IFACEMETHODIMP CSTXAnimatedTreeCtrlNS::get_accSelection( __out VARIANT * pvarSelectedChildren )
 {
 	HSTXTREENODE hNode = GetSelectedItem();
-	if(hNode == NULL)
+	if(hNode == nullptr)
 		return DISP_E_MEMBERNOTFOUND;
 
 	return InitVariantFromInt32(hNode->m_nAccID, pvarSelectedChildren);
@@ -3728,21 +3728,21 @@ IFACEMETHODIMP CSTXAnimatedTreeCtrlNS::get_accRole( VARIANT varChild, __out VARI
 
 void CSTXAnimatedTreeCtrlNS::Internal_ModifyItemStyle( HSTXTREENODE hItem, DWORD dwAdd, DWORD dwRemove )
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_ROOT || hItem == STXTVI_SORT)
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_ROOT || hItem == STXTVI_SORT)
 		return;
 
 	hItem->m_dwItemStyle |= dwAdd;
 	hItem->m_dwItemStyle &= (~dwRemove);
 
 	if(GetSafeHwnd())
-		InvalidateRect(m_hwndControl, NULL, TRUE);
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
 }
 
 void CSTXAnimatedTreeCtrlNS::Internal_SetItemDrawFunction( STXAnimatedTreeItemDrawFuncType lpfnItemDrawFunc )
 {
 	m_pfnItemDrawFunc = lpfnItemDrawFunc;
 	if(GetSafeHwnd())
-		InvalidateRect(m_hwndControl, NULL, TRUE);
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
 }
 
 DWORD CSTXAnimatedTreeCtrlNS::Internal_GetItemState( HSTXTREENODE hItem )
@@ -3795,10 +3795,10 @@ void CSTXAnimatedTreeCtrlNS::OnEndEdit()
 
 BOOL CSTXAnimatedTreeCtrlNS::Internal_GetItemRect( HSTXTREENODE hItem, LPRECT lprcItemRect )
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_ROOT || hItem == STXTVI_SORT)
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_ROOT || hItem == STXTVI_SORT)
 		return FALSE;
 
-	if(lprcItemRect == NULL)
+	if(lprcItemRect == nullptr)
 		return FALSE;
 
 	hItem->GetItemScreenRect(lprcItemRect);
@@ -3820,7 +3820,7 @@ void CSTXAnimatedTreeCtrlNS::Internal_SetBackgroundColor( COLORREF clrBackground
 {
 	m_clrBackground = Gdiplus::Color(255, GetRValue(clrBackground), GetGValue(clrBackground), GetBValue(clrBackground));
 	if(GetSafeHwnd())
-		InvalidateRect(m_hwndControl, NULL, TRUE);
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
 }
 
 HSTXTREENODE CSTXAnimatedTreeCtrlNS::Internal_GetParentItem( HSTXTREENODE hItem )
@@ -3833,16 +3833,16 @@ BOOL CSTXAnimatedTreeCtrlNS::PreSendNotifyMessage( UINT nCode, LPNMHDR pNMHDR )
 	return TRUE;
 }
 
-std::tr1::shared_ptr<Gdiplus::Image> CSTXAnimatedTreeCtrlNS::OnItemImageCallback(HSTXTREENODE hItem)
+std::shared_ptr<Gdiplus::Image> CSTXAnimatedTreeCtrlNS::OnItemImageCallback(HSTXTREENODE hItem)
 {
-	return NULL;
+	return nullptr;
 }
 
 void CSTXAnimatedTreeCtrlNS::OnInternalHoverItemChanged( HSTXTREENODE hItem )
 {
 	if(hItem)
 	{
-		SetTimer(m_hwndControl, STXTC_TIMER_ID_ITEM_FLOAT_CHECK, STXTC_TIMER_INTERVAL_ITEM_FLOAT_CHECK, NULL);
+		SetTimer(m_hwndControl, STXTC_TIMER_ID_ITEM_FLOAT_CHECK, STXTC_TIMER_INTERVAL_ITEM_FLOAT_CHECK, nullptr);
 	}
 	else
 	{
@@ -3886,7 +3886,7 @@ BOOL CSTXAnimatedTreeCtrlNS::SetItemIndent( int nItemIndent )
 
 BOOL CSTXAnimatedTreeCtrlNS::Internal_SetItemText( HSTXTREENODE hItem, LPCTSTR pszText )
 {
-	if(hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_ROOT || hItem == STXTVI_SORT)
+	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_ROOT || hItem == STXTVI_SORT)
 		return FALSE;
 
 	hItem->m_strText = pszText;
@@ -3895,14 +3895,14 @@ BOOL CSTXAnimatedTreeCtrlNS::Internal_SetItemText( HSTXTREENODE hItem, LPCTSTR p
 	ResetHorizontalScrollBar();
 
 	if(GetSafeHwnd())
-		InvalidateRect(m_hwndControl, NULL, TRUE);
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
 
 	return TRUE;
 }
 
 BOOL CSTXAnimatedTreeCtrlNS::Internal_SetItemSubText(HSTXTREENODE hItem, LPCTSTR pszSubText)
 {
-	if (hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_ROOT || hItem == STXTVI_SORT)
+	if (hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_ROOT || hItem == STXTVI_SORT)
 		return FALSE;
 
 	if (pszSubText)
@@ -3917,7 +3917,7 @@ BOOL CSTXAnimatedTreeCtrlNS::Internal_SetItemSubText(HSTXTREENODE hItem, LPCTSTR
 	}
 
 	if (GetSafeHwnd())
-		InvalidateRect(m_hwndControl, NULL, TRUE);
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
 
 	return TRUE;
 }
@@ -3958,14 +3958,14 @@ int CSTXAnimatedTreeCtrlNS::GetItemMaxBoundsX(HSTXTREENODE hItem)
 
 	do
 	{
-		if (hItem->m_pImgImage == NULL && (hItem->m_dwItemStyle & STXTVIS_IMAGE_CALLBACK) == 0)
+		if (hItem->m_pImgImage == nullptr && (hItem->m_dwItemStyle & STXTVIS_IMAGE_CALLBACK) == 0)
 			break;
 
-		std::tr1::shared_ptr<Gdiplus::Image> imgUse = hItem->m_pImgImage;
+		std::shared_ptr<Gdiplus::Image> imgUse = hItem->m_pImgImage;
 		if (hItem->m_dwItemStyle & STXTVIS_IMAGE_CALLBACK)
 			imgUse = OnItemImageCallback(hItem);
 
-		if (imgUse == NULL)
+		if (imgUse == nullptr)
 			break;
 
 		nLeft += (int)rItemHeight;
@@ -3996,7 +3996,7 @@ int CSTXAnimatedTreeCtrlNS::GetItemMaxBoundsX(HSTXTREENODE hItem)
 void CSTXAnimatedTreeCtrlNS::GetDefaultFontInfo()
 {
 	HFONT hFont = (HFONT)::GetStockObject(DEFAULT_GUI_FONT);
-	if (hFont != NULL)
+	if (hFont != nullptr)
 	{
 		::GetObject(hFont, sizeof(LOGFONT), &m_lfDefaultFont);
 		::DeleteObject(hFont);
@@ -4029,7 +4029,7 @@ BOOL CSTXAnimatedTreeCtrlNS::SetWatermarkLocation(UINT nLocation)
 	m_nWatermarkLocation = nLocation;
 
 	if (GetSafeHwnd())
-		InvalidateRect(m_hwndControl, NULL, TRUE);
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
 
 	return TRUE;
 }
@@ -4039,7 +4039,7 @@ void CSTXAnimatedTreeCtrlNS::SetWatermarkOpacity(double fOpacity)
 	m_fWatermarkOpacity = fOpacity;
 
 	if (GetSafeHwnd() && m_pImgWatermark)
-		InvalidateRect(m_hwndControl, NULL, TRUE);
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
 }
 
 BOOL CSTXAnimatedTreeCtrlNS::Internal_SelectItem(HSTXTREENODE hItem)
@@ -4047,7 +4047,7 @@ BOOL CSTXAnimatedTreeCtrlNS::Internal_SelectItem(HSTXTREENODE hItem)
 	if (hItem == m_hSelectedNode)
 		return FALSE;
 
-	if (hItem == NULL || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_ROOT || hItem == STXTVI_SORT)
+	if (hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_ROOT || hItem == STXTVI_SORT)
 		return FALSE;
 
 	SelectNode(hItem);

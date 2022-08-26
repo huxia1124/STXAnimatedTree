@@ -152,8 +152,6 @@ IDB_PNG_EXPANDED        PNG                     "res\\Expanded.png"
 
 IDB_PNG_SUB_IMAGE       PNG                     "res\\SubImage.png"
 
-IDB_PNG_WATERMARK       PNG                     "res\\Varcool_64.png"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //

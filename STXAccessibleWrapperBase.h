@@ -16,7 +16,7 @@ private:
 	// Need ptr to the IAccessible - also keep around ptrs to EnumVar and
 	// OleWindow as part of this object, so we can filter those interfaces
 	// and trap their QI's...
-	// (We leave pEnumVar and OleWin as NULL until we need them)
+	// (We leave pEnumVar and OleWin as nullptr until we need them)
 	IAccessible    *_pAcc;
 	IEnumVARIANT   *_pEnumVar;
 	IOleWindow     *_pOleWin;
@@ -84,15 +84,15 @@ static LRESULT CALLBACK AccessibleSubWndProc(HWND hWnd, UINT uMsg, WPARAM wParam
 	case WM_GETOBJECT:
 		if ((DWORD)lParam == OBJID_CLIENT)
 		{
-			CAccessibleWrapperBase *pWrapAcc = NULL;
-			IAccessible *pAcc = NULL;
+			CAccessibleWrapperBase *pWrapAcc = nullptr;
+			IAccessible *pAcc = nullptr;
 			HRESULT hr = CreateStdAccessibleObject(hWnd, OBJID_CLIENT, IID_PPV_ARGS(&pAcc));
 			if (SUCCEEDED(hr) && pAcc)
 			{
 				pWrapAcc = new T(pAcc, dwRefData);
 				pAcc->Release();
 
-				if (pWrapAcc != NULL)
+				if (pWrapAcc != nullptr)
 				{
 					LRESULT lres = LresultFromObject(IID_IAccessible, wParam, SAFECAST(pWrapAcc, IAccessible*));
 					pWrapAcc->Release();

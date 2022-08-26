@@ -14,15 +14,11 @@
 #define IDR_MAINFRAME                   128
 #define IDB_PNG1                        129
 #define IDB_PNG2                        130
-#define IDB_PNG3                        131
 #define IDB_PNG_MAIL                    131
 #define IDB_PNG_BK                      132
 #define IDB_PNG_COLLAPSED               133
 #define IDB_PNG_EXPANDED                134
-#define IDB_PNG4                        135
 #define IDB_PNG_SUB_IMAGE               135
-#define IDB_PNG5                        136
-#define IDB_PNG_WATERMARK               136
 #define IDC_STATIC                      -1
 
 // Next default values for new objects

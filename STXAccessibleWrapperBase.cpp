@@ -11,7 +11,7 @@ extern "C++" {
 		if (p)
 		{
 			T *pTemp = p;
-			p = NULL;
+			p = nullptr;
 			pTemp->Release();
 		}
 	}
@@ -21,9 +21,9 @@ extern "C++" {
 // shorthand
 #ifndef ATOMICRELEASE
 #ifdef __cplusplus
-#define ATOMICRELEASET(p, type) { if(p) { type* punkT=(p); (p)=NULL; punkT->Release();} }
+#define ATOMICRELEASET(p, type) { if(p) { type* punkT=(p); (p)=nullptr; punkT->Release();} }
 #else
-#define ATOMICRELEASET(p, type) { if(p) { type* punkT=(p); (p)=NULL; punkT->lpVtbl->Release(punkT);} }
+#define ATOMICRELEASET(p, type) { if(p) { type* punkT=(p); (p)=nullptr; punkT->lpVtbl->Release(punkT);} }
 #endif
 
 // doing this as a function instead of inline seems to be a size win.
@@ -79,7 +79,7 @@ HRESULT InitVariantFromDispatch(__in_opt IDispatch* pdisp, __out VARIANT *pvar)
 //   Functions in this file do not depend on propsys.dll
 
 CAccessibleWrapperBase::CAccessibleWrapperBase(__in IAccessible *pAcc)
-: _cRef(1), _pAcc(pAcc), _pEnumVar(NULL), _pOleWin(NULL)
+: _cRef(1), _pAcc(pAcc), _pEnumVar(nullptr), _pOleWin(nullptr)
 {
 	_pAcc->AddRef();
 }
@@ -97,7 +97,7 @@ CAccessibleWrapperBase::~CAccessibleWrapperBase()
 STDMETHODIMP CAccessibleWrapperBase::QueryInterface(REFIID riid, __out void** ppv)
 {
 	HRESULT hr;
-	*ppv = NULL;
+	*ppv = nullptr;
 
 	if ((riid == IID_IUnknown)  ||
 		(riid == IID_IDispatch) ||
@@ -114,10 +114,10 @@ STDMETHODIMP CAccessibleWrapperBase::QueryInterface(REFIID riid, __out void** pp
 			hr = _pAcc->QueryInterface(IID_PPV_ARGS(&_pEnumVar));
 			if (FAILED(hr))
 			{
-				_pEnumVar = NULL;
+				_pEnumVar = nullptr;
 				return hr;
 			}
-			// Paranoia (in case QI returns S_OK with NULL...)
+			// Paranoia (in case QI returns S_OK with nullptr...)
 			if (!_pEnumVar)
 				return E_NOINTERFACE;
 		}
@@ -133,10 +133,10 @@ STDMETHODIMP CAccessibleWrapperBase::QueryInterface(REFIID riid, __out void** pp
 			hr = _pAcc->QueryInterface(IID_PPV_ARGS(&_pOleWin));
 			if(FAILED(hr))
 			{
-				_pOleWin = NULL;
+				_pOleWin = nullptr;
 				return hr;
 			}
-			// Paranoia (in case QI returns S_OK with NULL...)
+			// Paranoia (in case QI returns S_OK with nullptr...)
 			if (!_pOleWin)
 				return E_NOINTERFACE;
 		}
@@ -336,7 +336,7 @@ STDMETHODIMP CAccessibleWrapperBase::ContextSensitiveHelp(BOOL fEnterMode)
 
 
 //-----------------------
-CSHAccessibleBase::CSHAccessibleBase() : _ptiAcc(NULL)
+CSHAccessibleBase::CSHAccessibleBase() : _ptiAcc(nullptr)
 { 
 	//DllAddRef();
 	_cRef = 1;
@@ -379,7 +379,7 @@ STDMETHODIMP_(ULONG) CSHAccessibleBase::Release()
 // private IDispatch Helpers
 HRESULT CSHAccessibleBase::s_accLoadTypeInfo(__out ITypeInfo **ppti)
 {
-	*ppti = NULL;
+	*ppti = nullptr;
 	ITypeLib *ptl;
 	HRESULT hr = LoadTypeLib(L"oleacc.dll", &ptl);
 	if (SUCCEEDED(hr))
@@ -428,7 +428,7 @@ STDMETHODIMP CSHAccessibleBase::GetTypeInfo(UINT iTInfo, LCID lcid, __out ITypeI
 		return DISP_E_BADINDEX;
 	}
 
-	*ppTInfo = NULL;
+	*ppTInfo = nullptr;
 	HRESULT hr = _EnsureTypeInfo();
 	if (SUCCEEDED(hr))
 	{
@@ -481,7 +481,7 @@ STDMETHODIMP CSHAccessibleBase::Invoke(
 //  IAccessible
 STDMETHODIMP CSHAccessibleBase::get_accParent(__out IDispatch **ppdispParent)
 {
-	*ppdispParent = NULL;
+	*ppdispParent = nullptr;
 	return S_FALSE;
 }
 
@@ -493,7 +493,7 @@ STDMETHODIMP CSHAccessibleBase::get_accChildCount(__out long *pcChildren)
 
 STDMETHODIMP CSHAccessibleBase::get_accChild(VARIANT varChild, __out IDispatch **ppdispChild)
 {
-	*ppdispChild = NULL;
+	*ppdispChild = nullptr;
 	HRESULT hr = _ValidateAccChild(&varChild);
 	if (SUCCEEDED(hr))
 	{
@@ -504,7 +504,7 @@ STDMETHODIMP CSHAccessibleBase::get_accChild(VARIANT varChild, __out IDispatch *
 
 STDMETHODIMP CSHAccessibleBase::get_accValue(VARIANT varChild, __out BSTR *pbstrValue)
 {
-	*pbstrValue = NULL;
+	*pbstrValue = nullptr;
 	HRESULT hr = _ValidateAccChild(&varChild);
 	if (SUCCEEDED(hr))
 	{
@@ -522,7 +522,7 @@ STDMETHODIMP CSHAccessibleBase::get_accValue(VARIANT varChild, __out BSTR *pbstr
 
 STDMETHODIMP CSHAccessibleBase::get_accName(VARIANT varChild, __out BSTR *pbstrName)
 {
-	*pbstrName = NULL;
+	*pbstrName = nullptr;
 	HRESULT hr = _ValidateAccChild(&varChild);
 	if (SUCCEEDED(hr))
 	{
@@ -540,7 +540,7 @@ STDMETHODIMP CSHAccessibleBase::get_accName(VARIANT varChild, __out BSTR *pbstrN
 
 STDMETHODIMP CSHAccessibleBase::get_accDescription(VARIANT varChild, __out BSTR *pbstrDescription)
 {
-	*pbstrDescription = NULL;
+	*pbstrDescription = nullptr;
 	HRESULT hr = _ValidateAccChild(&varChild);
 	if (SUCCEEDED(hr))
 	{
@@ -596,7 +596,7 @@ STDMETHODIMP CSHAccessibleBase::get_accState(VARIANT varChild, __out VARIANT *pv
 
 STDMETHODIMP CSHAccessibleBase::get_accHelp(VARIANT varChild, __out BSTR *pbstrHelp)
 {
-	*pbstrHelp = NULL;
+	*pbstrHelp = nullptr;
 	HRESULT hr = _ValidateAccChild(&varChild);
 	if (SUCCEEDED(hr))
 	{
@@ -614,7 +614,7 @@ STDMETHODIMP CSHAccessibleBase::get_accHelp(VARIANT varChild, __out BSTR *pbstrH
 
 STDMETHODIMP CSHAccessibleBase::get_accHelpTopic(__out BSTR *pbstrHelpFile, VARIANT varChild, __out long *pidTopic)
 {
-	*pbstrHelpFile = NULL;
+	*pbstrHelpFile = nullptr;
 	*pidTopic    = -1;
 	HRESULT hr = _ValidateAccChild(&varChild);
 	if (SUCCEEDED(hr))
@@ -626,7 +626,7 @@ STDMETHODIMP CSHAccessibleBase::get_accHelpTopic(__out BSTR *pbstrHelpFile, VARI
 
 STDMETHODIMP CSHAccessibleBase::get_accKeyboardShortcut(VARIANT varChild, __out BSTR *pbstrKeyboardShortcut)
 {
-	*pbstrKeyboardShortcut = NULL;
+	*pbstrKeyboardShortcut = nullptr;
 	HRESULT hr = _ValidateAccChild(&varChild);
 	if (SUCCEEDED(hr))
 	{
@@ -649,7 +649,7 @@ STDMETHODIMP CSHAccessibleBase::get_accSelection(__out VARIANT *pvarSelectedChil
 
 STDMETHODIMP CSHAccessibleBase::get_accDefaultAction(VARIANT varChild, __out BSTR *pbstrDefaultAction)
 {
-	*pbstrDefaultAction = NULL;
+	*pbstrDefaultAction = nullptr;
 	HRESULT hr = _ValidateAccChild(&varChild);
 	if (SUCCEEDED(hr))
 	{
@@ -795,7 +795,7 @@ HRESULT CSHAccessibleBase::_ValidateAccChild(__inout VARIANT *pvar)
 //  IAccessible
 STDMETHODIMP CSHAccessibleHWNDBase::get_accParent(__out IDispatch **ppdispParent)
 {
-	*ppdispParent = NULL;
+	*ppdispParent = nullptr;
 	HRESULT hr = S_FALSE;
 	HWND hwnd = v_GetWindow();
 	if (IsWindow(hwnd))
