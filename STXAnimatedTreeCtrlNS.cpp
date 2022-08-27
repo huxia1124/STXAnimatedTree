@@ -1953,6 +1953,7 @@ UINT CSTXAnimatedTreeCtrlNS::OnGetDlgCode()
 
 void CSTXAnimatedTreeCtrlNS::OnSize( UINT nType, int cx, int cy )
 {
+	m_pImgBackgroundCached.reset();
 	ResetScrollBars();
 }
 
@@ -1982,7 +1983,7 @@ void CSTXAnimatedTreeCtrlNS::ResetScrollBars()
 	int nTotalHeight = static_cast<int>(GetCurrentTotalHeightBefore(&m_arrRootNodes, STXTVI_LAST));
 	if(m_arrRootNodes.size() > 0 && nTotalHeight > iTotalHeightAvailable)	//Need H-ScrollBar
 	{
-		OutputDebugString(_T("Need V-Scrol Bar\n"));
+		//OutputDebugString(_T("Need V-Scrol Bar\n"));
 		SCROLLINFO si;
 		si.cbSize = sizeof(si);
 		si.fMask = SIF_PAGE|SIF_POS|SIF_RANGE;
