@@ -59,6 +59,7 @@ typedef std::list<std::shared_ptr<CSTXAnimatedTreeNodeNS> >  STXTREENODELIST;
 
 CSTXAnimatedTreeNodeNS::CSTXAnimatedTreeNodeNS(CSTXAnimatedTreeCtrlNS *pParentControl)
 : m_pParentControl(pParentControl)
+, m_clrBackground(0, 0, 0, 0)
 {
 	static long sAccID = 1;
 	m_pParentNode = nullptr;
@@ -213,8 +214,19 @@ void CSTXAnimatedTreeNodeNS::DrawItem(Gdiplus::Graphics *pGraphics, Gdiplus::Rec
 		itemDraw.dwStage = STXTV_STAGE_BACKGROUND;
 		if(m_pParentControl->m_pfnItemDrawFunc == nullptr || m_pParentControl->m_pfnItemDrawFunc(&itemDraw) == STXTV_CDRF_DODEFAULT)
 		{
-			DrawHover(pGraphics, rectItem, rectItemFinal, fHorzOffset, fNodeOpacity, iImageOccupie);
-			DrawSelection(pGraphics, rectItem, rectItemFinal, fHorzOffset, fNodeOpacity, iImageOccupie);
+			Gdiplus::RectF rectItemBackground = *rectItem;
+			Gdiplus::RectF rectItemBackgroundFinal = *rectItemFinal;
+			if (m_dwItemStyle & STXTVIS_FULL_ROW_BACKGROUND)
+			{
+				rectItemBackground.Width += rectItemBackground.X;
+				rectItemBackground.X = 0.0f;
+				rectItemBackgroundFinal.Width += rectItemBackgroundFinal.X;
+				rectItemBackgroundFinal.X = 0.0f;
+			}
+
+			DrawBackground(pGraphics, &rectItemBackground, &rectItemBackgroundFinal, fHorzOffset, fNodeOpacity, iImageOccupie);
+			DrawHover(pGraphics, &rectItemBackground, &rectItemBackgroundFinal, fHorzOffset, fNodeOpacity, iImageOccupie);
+			DrawSelection(pGraphics, &rectItemBackground, &rectItemBackgroundFinal, fHorzOffset, fNodeOpacity, iImageOccupie);
 		}
 
 		DrawItemImage(pGraphics, rectItem, rectItemFinal, fHorzOffset, fNodeOpacity, &itemDraw);
@@ -407,6 +419,19 @@ void CSTXAnimatedTreeNodeNS::DrawLines(Gdiplus::Graphics * pGraphics, Gdiplus::R
 	}
 }
 
+void CSTXAnimatedTreeNodeNS::DrawBackground(Gdiplus::Graphics * pGraphics, Gdiplus::RectF *rectItem, Gdiplus::RectF* rectItemFinal, Gdiplus::REAL fHorzOffset, DOUBLE fNodeOpacity, int iImageOccupie)
+{
+	if (m_clrBackground.GetAlpha() == 0)
+		return;
+	
+	Gdiplus::SolidBrush bkBrush(Gdiplus::Color(static_cast<BYTE>(m_clrBackground.GetAlpha() * fNodeOpacity), m_clrBackground.GetRed(), m_clrBackground.GetGreen(), m_clrBackground.GetBlue()));
+	Gdiplus::RectF rectSelection(*rectItem);
+	rectSelection.Offset(-fHorzOffset, 0);
+	rectSelection.Width += fHorzOffset;
+
+	pGraphics->FillRectangle(&bkBrush, rectSelection);
+}
+
 void CSTXAnimatedTreeNodeNS::DrawHover(Gdiplus::Graphics * pGraphics, Gdiplus::RectF *rectItem, Gdiplus::RectF* rectItemFinal, Gdiplus::REAL fHorzOffset, DOUBLE fNodeOpacity, int iImageOccupie)
 {
 // 	if(!m_bHover)
@@ -467,11 +492,14 @@ int CSTXAnimatedTreeNodeNS::DrawItemImage(Gdiplus::Graphics * pGraphics, Gdiplus
 
 	if(pGraphics == nullptr)
 		return iResult;
+
+	std::shared_ptr<Gdiplus::Image> img;
+	m_pParentControl->GetItemImageInUse(this, img);
 	
-	if(m_pImgImage == nullptr && (m_dwItemStyle & STXTVIS_IMAGE_CALLBACK) == 0)
+	if(img == nullptr && (m_dwItemStyle & STXTVIS_IMAGE_CALLBACK) == 0)
 		return iResult;
 
-	std::shared_ptr<Gdiplus::Image> imgUse = m_pImgImage;
+	std::shared_ptr<Gdiplus::Image> imgUse = img;
 	if(m_dwItemStyle & STXTVIS_IMAGE_CALLBACK)
 		imgUse = m_pParentControl->OnItemImageCallback(this);
 
@@ -633,7 +661,10 @@ HSTXTREENODE CSTXAnimatedTreeNodeNS::HitTest(POINT pt, int iControlWidth,  int i
 
 	if(PtInRect(&rcNode, pt))		//In the item area?
 	{
-		if(pFlags && m_pImgImage)
+		std::shared_ptr<Gdiplus::Image> img;
+		m_pParentControl->GetItemImageInUse(this, img);
+
+		if(pFlags && img)
 		{
 			RECT rcImage = rcNode;
 			rcImage.right = rcImage.left + (rcImage.bottom - rcImage.top);
@@ -787,6 +818,11 @@ void CSTXAnimatedTreeNodeNS::GetItemScreenRect( __out LPRECT lprcRect )
 	rcItem.bottom = rcItem.top + fHeight;
 	
 	*lprcRect = rcItem;
+}
+
+BOOL CSTXAnimatedTreeNodeNS::HasImage() const
+{
+	return m_pImgImage || !m_strImageKey.empty();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -2651,6 +2687,46 @@ std::shared_ptr<Gdiplus::Image> CSTXAnimatedTreeCtrlNS::GetResizedImage( std::sh
 	}
 }
 
+BOOL CSTXAnimatedTreeCtrlNS::CacheImage(LPCTSTR lpszImageKey, IStream* pStream, int cachedDimension)
+{
+	if (m_cachedImages.find(lpszImageKey) != m_cachedImages.end())
+		return FALSE;
+
+	std::shared_ptr<Gdiplus::Image> pImg = GetResizedImage(pStream, cachedDimension);
+	if (pImg && pImg->GetWidth() == 0)
+		pImg.reset();
+
+	m_cachedImages[lpszImageKey] = pImg;
+	return TRUE;
+}
+
+BOOL CSTXAnimatedTreeCtrlNS::CacheImage(LPCTSTR lpszImageKey, LPCTSTR lpszImageFile, int cachedDimension)
+{
+	if (m_cachedImages.find(lpszImageKey) != m_cachedImages.end())
+		return FALSE;
+
+	CComPtr<IStream> pStream = nullptr;
+	SHCreateStreamOnFile(lpszImageFile, STGM_READ | STGM_SHARE_DENY_WRITE, &pStream);
+	if (!pStream)
+		return FALSE;
+
+	return CacheImage(lpszImageKey, pStream, cachedDimension);
+}
+
+BOOL CSTXAnimatedTreeCtrlNS::RemoveCachedImage(LPCTSTR lpszImageKey)
+{
+	if (m_cachedImages.find(lpszImageKey) == m_cachedImages.end())
+		return FALSE;
+
+	m_cachedImages.erase(lpszImageKey);
+	return TRUE;
+}
+
+void CSTXAnimatedTreeCtrlNS::ClearCachedImages()
+{
+	m_cachedImages.clear();
+}
+
 BOOL CSTXAnimatedTreeCtrlNS::SetItemImage(HSTXTREENODE hItem, IStream *pStream, BOOL bResizeImage)
 {
 	if (hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
@@ -2667,6 +2743,7 @@ BOOL CSTXAnimatedTreeCtrlNS::SetItemImage(HSTXTREENODE hItem, IStream *pStream, 
 	if(pImg && pImg->GetWidth() == 0)
 		pImg.reset();
 
+	hItem->m_strImageKey.clear();
 	hItem->m_pImgImage = pImg;
 
 	if(pImg && pImg->GetWidth() > 0)
@@ -2819,6 +2896,72 @@ void CSTXAnimatedTreeCtrlNS::SetItemImage(HSTXTREENODE hItem, LPCTSTR lpszImageF
 		SetItemImage(hItem, pStream, bResizeImage);
 		pStream->Release();
 	}
+}
+
+BOOL CSTXAnimatedTreeCtrlNS::SetItemImageKey(HSTXTREENODE hItem, LPCTSTR lpszImageKey)
+{
+	if (hItem == nullptr || lpszImageKey  == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST)
+		return FALSE;
+
+	auto it = m_cachedImages.find(lpszImageKey);
+	if(it == m_cachedImages.end())
+		return FALSE;
+
+	hItem->m_pImgImage.reset();
+	hItem->m_strImageKey = lpszImageKey;
+
+	if (it->second && it->second->GetWidth() > 0)
+	{
+		CComPtr<IUIAnimationStoryboard> pStory;
+		m_AnimationManager->CreateStoryboard(&pStory);
+
+		CComPtr<IUIAnimationTransition> pTrans;
+		m_AnimationTransitionLibrary->CreateSmoothStopTransition(m_nDefaultAnimationDuration / 1.0, 1.0, &pTrans);
+		pTrans->SetInitialValue(1.1);
+		pTrans->SetInitialVelocity(3.0);
+		pStory->AddTransition(hItem->m_pAVImageScale, pTrans);
+
+		CComPtr<IUIAnimationTransition> pTransImageOpacity;
+		m_AnimationTransitionLibrary->CreateSmoothStopTransition(m_nDefaultAnimationDuration / 1.0, 1.0, &pTransImageOpacity);
+		pStory->AddTransition(hItem->m_pAVImageOpacity, pTransImageOpacity);
+
+		DOUBLE fItemHeightFinal = 0.0;
+		hItem->m_pAVItemHeight->GetFinalValue(&fItemHeightFinal);
+		CComPtr<IUIAnimationTransition> pTransImageSize;
+		m_AnimationTransitionLibrary->CreateSmoothStopTransition(m_nDefaultAnimationDuration / 1.0, fItemHeightFinal + 2, &pTransImageSize);
+		pTransImageSize->SetInitialVelocity(0.0);
+		pStory->AddTransition(hItem->m_pAVImageOccupy, pTransImageSize);
+
+		pStory->Schedule(GetCurrentTime(), nullptr);
+	}
+	else
+	{
+		CComPtr<IUIAnimationStoryboard> pStory;
+		m_AnimationManager->CreateStoryboard(&pStory);
+
+		CComPtr<IUIAnimationTransition> pTrans;
+		m_AnimationTransitionLibrary->CreateSmoothStopTransition(m_nDefaultAnimationDuration / 1.0, 0.0, &pTrans);
+		pStory->AddTransition(hItem->m_pAVImageScale, pTrans);
+
+		CComPtr<IUIAnimationTransition> pTransImageOpacity;
+		m_AnimationTransitionLibrary->CreateSmoothStopTransition(m_nDefaultAnimationDuration / 1.0, 0.0, &pTransImageOpacity);
+		pStory->AddTransition(hItem->m_pAVImageOpacity, pTransImageOpacity);
+
+		CComPtr<IUIAnimationTransition> pTransImageSize;
+		m_AnimationTransitionLibrary->CreateSmoothStopTransition(m_nDefaultAnimationDuration / 1.0, 0, &pTransImageSize);
+		pStory->AddTransition(hItem->m_pAVImageOccupy, pTransImageSize);
+
+		pStory->Schedule(GetCurrentTime(), nullptr);
+		hItem->m_pImgImage = std::shared_ptr<Gdiplus::Image>();		//nullptr
+	}
+
+	hItem->m_nBoundsMaxX = -1;
+	ResetHorizontalScrollBar();
+
+	if (GetSafeHwnd() && IsItemVisible(hItem))
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
+
+	return TRUE;
 }
 
 BOOL CSTXAnimatedTreeCtrlNS::Internal_DeleteItem(HSTXTREENODE hItem)
@@ -3177,7 +3320,7 @@ BOOL CSTXAnimatedTreeCtrlNS::Internal_SetItemHeight( HSTXTREENODE hItem, int iHe
 	ApplySmoothStopTransition(hItem->m_pAVItemHeight, m_nDefaultAnimationDuration / 2, iHeight);
 	DOUBLE fDelta = iHeight - fItemHeightFinal;
 
-	if(hItem->m_pImgImage)
+	if(hItem->HasImage())
 		ApplySmoothStopTransition(hItem->m_pAVImageOccupy, m_nDefaultAnimationDuration / 2, iHeight);
 
 	if(hItem->m_pParentNode)
@@ -3923,6 +4066,40 @@ BOOL CSTXAnimatedTreeCtrlNS::Internal_SetItemSubText(HSTXTREENODE hItem, LPCTSTR
 	return TRUE;
 }
 
+BOOL CSTXAnimatedTreeCtrlNS::Internal_SetItemFullRowBackground(HSTXTREENODE hItem, BOOL bFullRowBackground)
+{
+	if (hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_ROOT || hItem == STXTVI_SORT)
+		return FALSE;
+
+	if (bFullRowBackground)
+	{
+		hItem->m_dwItemStyle |= STXTVIS_FULL_ROW_BACKGROUND;
+	}
+	else
+	{
+		hItem->m_dwItemStyle &= (~STXTVIS_FULL_ROW_BACKGROUND);
+	}
+
+	if (GetSafeHwnd())
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
+
+	return TRUE;
+}
+
+BOOL CSTXAnimatedTreeCtrlNS::Internal_SetItemBackgroundColor(HSTXTREENODE hItem, COLORREF color, BYTE alpha)
+{
+	if (hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_ROOT || hItem == STXTVI_SORT)
+		return FALSE;
+
+	hItem->m_clrBackground.SetFromCOLORREF(color);
+	hItem->m_clrBackground = Gdiplus::Color(alpha, GetRValue(color), GetGValue(color), GetBValue(color));
+
+	if (GetSafeHwnd())
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
+
+	return TRUE;
+}
+
 int CSTXAnimatedTreeCtrlNS::GetCurrentContentWidth()
 {
 	std::vector<HSTXTREENODE> items;
@@ -3957,12 +4134,15 @@ int CSTXAnimatedTreeCtrlNS::GetItemMaxBoundsX(HSTXTREENODE hItem)
 
 	Gdiplus::REAL rItemHeight = static_cast<Gdiplus::REAL>(fItemHeight);
 
+	std::shared_ptr<Gdiplus::Image> img;
+	GetItemImageInUse(hItem, img);
+
 	do
 	{
-		if (hItem->m_pImgImage == nullptr && (hItem->m_dwItemStyle & STXTVIS_IMAGE_CALLBACK) == 0)
+		if (img == nullptr && (hItem->m_dwItemStyle & STXTVIS_IMAGE_CALLBACK) == 0)
 			break;
 
-		std::shared_ptr<Gdiplus::Image> imgUse = hItem->m_pImgImage;
+		std::shared_ptr<Gdiplus::Image> imgUse = img;
 		if (hItem->m_dwItemStyle & STXTVIS_IMAGE_CALLBACK)
 			imgUse = OnItemImageCallback(hItem);
 
@@ -4009,6 +4189,21 @@ void CSTXAnimatedTreeCtrlNS::GetDefaultFontInfo()
 		m_lfDefaultSubTextFont.lfHeight = (LONG)(m_lfDefaultSubTextFont.lfHeight / 1.3);
 		m_pDefaultSubTextFont = new Gdiplus::Font(hDC, &m_lfDefaultSubTextFont);
 		::ReleaseDC(m_hwndControl, hDC);
+	}
+}
+
+void CSTXAnimatedTreeCtrlNS::GetItemImageInUse(HSTXTREENODE hItem, std::shared_ptr<Gdiplus::Image>& img) const
+{
+	if (hItem->HasImage())
+	{
+		if (hItem->m_pImgImage)
+			img = hItem->m_pImgImage;
+		else
+		{
+			auto it = m_cachedImages.find(hItem->m_strImageKey);
+			if (it != m_cachedImages.end())
+				img = it->second;
+		}
 	}
 }
 

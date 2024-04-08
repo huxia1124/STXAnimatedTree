@@ -185,6 +185,10 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 		return FALSE;
 	}
 
+	// Use shared cached image to reduce memory overhead
+	g_pWnd->CacheImage(_T("ItemImage1"), pStream1);
+	g_pWnd->CacheImage(_T("ItemImage2"), pStream2);
+
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_STXANIMATEDTREETEST));
 
 	// Message loop
@@ -330,33 +334,64 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_TIMER:
 		iTimerStep++;
-		if(iTimerStep == 1) g_pWnd->Internal_InsertItem(_T("Root 1. Animated Tree Control Demo by Huan Xia"));
-		if(iTimerStep == 2) g_NodeParent = g_pWnd->Internal_InsertItem(_T("Root 2. Windows 7/8/10 supported."));
-		if(iTimerStep == 3) g_NodeToSetImage[0] = g_pWnd->Internal_InsertItem(_T("Root 3. "));
-		if(iTimerStep == 20)g_pWnd->Internal_InsertItem(_T("Root 0"), STXTVI_ROOT, STXTVI_FIRST);
-		if(iTimerStep == 4) g_NodeToSetImage[1] = g_pWnd->Internal_InsertItem(_T("Child 2.1"), g_NodeParent);
-		if(iTimerStep == 5) g_NodeC1Parent = g_pWnd->Internal_InsertItem(_T("Child 2.2"), g_NodeParent);
-		if(iTimerStep == 6) g_NodeToSetImage[2] = g_pWnd->Internal_InsertItem(_T("Child 2.3"), g_NodeParent);
-		if(iTimerStep == 19) g_pWnd->Internal_InsertItem(_T("Child 2.4"), g_NodeParent);
-		if(iTimerStep == 7) g_NodeToSetImage[3] = g_NodeC2Parent = g_pWnd->Internal_InsertItem(_T("Child 2.2.1"), g_NodeC1Parent);
-		if(iTimerStep == 8) g_NodeToSetImage[7] = g_pWnd->Internal_InsertItem(_T("Child 2.2.2"), g_NodeC1Parent);
-		if(iTimerStep == 9) g_NodeToSetImage[4] = g_pWnd->Internal_InsertItem(_T("Child 2.2.3"), g_NodeC1Parent);
-		if(iTimerStep == 10) g_pWnd->Internal_InsertItem(_T("Child 2.2.1.1"), g_NodeC2Parent);
-		if(iTimerStep == 11) g_NodeToSetImage[5] = g_NodeC3Parent = g_pWnd->Internal_InsertItem(_T("Child 2.2.1.2"), g_NodeC2Parent);
-		if(iTimerStep == 12) g_NodeToSetImage[6] = g_pWnd->Internal_InsertItem(_T("Child 2.2.1.3"), g_NodeC2Parent);
-		if(iTimerStep == 13) g_pWnd->SetItemImage(g_NodeToSetImage[0], pStream1);
-		if(iTimerStep == 14) g_pWnd->SetItemImage(g_NodeToSetImage[1], pStream1);
-		if(iTimerStep == 15) g_pWnd->SetItemImage(g_NodeToSetImage[2], pStream1);
-		if(iTimerStep == 16) g_pWnd->SetItemImage(g_NodeToSetImage[3], pStream1);
-		if(iTimerStep == 17) g_pWnd->SetItemImage(g_NodeToSetImage[4], pStream1);
-		if(iTimerStep == 18) g_pWnd->Internal_InsertItem(_T("Root 4. Note: MSAA supported!"));
-		if(iTimerStep == 21) g_pWnd->SetItemImage(g_NodeToSetImage[5], pStream1);
-		if(iTimerStep == 22) g_pWnd->SetItemImage(g_NodeToSetImage[6], pStream2);
-		if(iTimerStep == 23) g_pWnd->SetItemImage(g_NodeToSetImage[7], pStream2);
-		if(iTimerStep == 24) g_NodeToSetImage[8] = g_pWnd->Internal_InsertItem(_T("Contact me: huxia1124@gmail.com"), g_NodeC3Parent, STXTVI_LAST, 0, 48);
-		if(iTimerStep == 25) g_pWnd->SetItemImage(g_NodeToSetImage[8], pStreamMail);
+		if (iTimerStep == 1) g_pWnd->Internal_InsertItem(_T("Root 1. Animated Tree Control Demo by Huan Xia"));
+		if (iTimerStep == 2)
+		{
+			g_NodeParent = g_pWnd->Internal_InsertItem(_T("Root 2. Windows 7/8/10/11 supported."));
+			g_pWnd->Internal_SetItemFullRowBackground(g_NodeParent, TRUE);
+		}
+		if (iTimerStep == 3) g_NodeToSetImage[0] = g_pWnd->Internal_InsertItem(_T("Root 3. "));
+		if (iTimerStep == 20)g_pWnd->Internal_InsertItem(_T("Root 0"), STXTVI_ROOT, STXTVI_FIRST);
+		if (iTimerStep == 4) g_NodeToSetImage[1] = g_pWnd->Internal_InsertItem(_T("Child 2.1"), g_NodeParent);
+		if (iTimerStep == 5) g_NodeC1Parent = g_pWnd->Internal_InsertItem(_T("Child 2.2"), g_NodeParent);
+		if (iTimerStep == 6)
+		{
+			g_NodeToSetImage[2] = g_pWnd->Internal_InsertItem(_T("Child 2.3 Custom Item Background"), g_NodeParent);
+			g_pWnd->Internal_SetItemBackgroundColor(g_NodeToSetImage[2], RGB(255, 128, 128), 64);
+		}
+		if (iTimerStep == 19) g_pWnd->Internal_InsertItem(_T("Child 2.4"), g_NodeParent);
+		if (iTimerStep == 7)
+		{
+			g_NodeToSetImage[3] = g_NodeC2Parent = g_pWnd->Internal_InsertItem(_T("Child 2.2.1 Full Row Background"), g_NodeC1Parent);
+			g_pWnd->Internal_SetItemFullRowBackground(g_NodeToSetImage[3], TRUE);
+		}
+		if (iTimerStep == 8) g_NodeToSetImage[7] = g_pWnd->Internal_InsertItem(_T("Child 2.2.2"), g_NodeC1Parent);
+		if (iTimerStep == 9) g_NodeToSetImage[4] = g_pWnd->Internal_InsertItem(_T("Child 2.2.3"), g_NodeC1Parent);
+		if (iTimerStep == 10) g_pWnd->Internal_InsertItem(_T("Child 2.2.1.1"), g_NodeC2Parent);
+		if (iTimerStep == 11) g_NodeToSetImage[5] = g_NodeC3Parent = g_pWnd->Internal_InsertItem(_T("Child 2.2.1.2"), g_NodeC2Parent);
+		if (iTimerStep == 12) g_NodeToSetImage[6] = g_pWnd->Internal_InsertItem(_T("Child 2.2.1.3"), g_NodeC2Parent);
 
-		if(iTimerStep >= 25)
+		//if (iTimerStep == 13) g_pWnd->SetItemImage(g_NodeToSetImage[0], pStream1);
+		//if (iTimerStep == 14) g_pWnd->SetItemImage(g_NodeToSetImage[1], pStream1);
+		//if (iTimerStep == 15) g_pWnd->SetItemImage(g_NodeToSetImage[2], pStream1);
+		//if (iTimerStep == 16) g_pWnd->SetItemImage(g_NodeToSetImage[3], pStream1);
+		//if (iTimerStep == 17) g_pWnd->SetItemImage(g_NodeToSetImage[4], pStream1);
+
+		// Use shared cached image to reduce memory overhead
+		if (iTimerStep == 13) g_pWnd->SetItemImageKey(g_NodeToSetImage[0], _T("ItemImage1"));
+		if (iTimerStep == 14) g_pWnd->SetItemImageKey(g_NodeToSetImage[1], _T("ItemImage1"));
+		if (iTimerStep == 15) g_pWnd->SetItemImageKey(g_NodeToSetImage[2], _T("ItemImage1"));
+		if (iTimerStep == 16) g_pWnd->SetItemImageKey(g_NodeToSetImage[3], _T("ItemImage1"));
+		if (iTimerStep == 17) g_pWnd->SetItemImageKey(g_NodeToSetImage[4], _T("ItemImage1"));
+
+		if (iTimerStep == 18) g_pWnd->Internal_InsertItem(_T("Root 4. Note: MSAA supported!"));
+		//if (iTimerStep == 21) g_pWnd->SetItemImage(g_NodeToSetImage[5], pStream1);
+		//if (iTimerStep == 22) g_pWnd->SetItemImage(g_NodeToSetImage[6], pStream2);
+		//if (iTimerStep == 23) g_pWnd->SetItemImage(g_NodeToSetImage[7], pStream2);
+		
+		// Use shared cached image to reduce memory overhead
+		if (iTimerStep == 21) g_pWnd->SetItemImageKey(g_NodeToSetImage[5], _T("ItemImage1"));
+		if (iTimerStep == 22) g_pWnd->SetItemImageKey(g_NodeToSetImage[6], _T("ItemImage2"));
+		if (iTimerStep == 23) g_pWnd->SetItemImageKey(g_NodeToSetImage[7], _T("ItemImage2"));
+
+		if (iTimerStep == 24)
+		{
+			g_NodeToSetImage[8] = g_pWnd->Internal_InsertItem(_T("Contact me: huxia1124@gmail.com"), g_NodeC3Parent, STXTVI_LAST, 0, 48);
+			g_pWnd->Internal_SetItemFullRowBackground(g_NodeToSetImage[8], TRUE);
+		}
+		if (iTimerStep == 25) g_pWnd->SetItemImage(g_NodeToSetImage[8], pStreamMail);
+
+		if (iTimerStep >= 25)
 		{
 			KillTimer(hWnd, 1);
 			g_pWnd->Internal_SetItemData(g_NodeToSetImage[0], 100);
@@ -399,7 +434,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case 1006:
 				{
 					HSTXTREENODE hNode = g_pWnd->GetSelectedItem();
-					g_pWnd->SetItemImage(hNode, pStream1);
+					g_pWnd->SetItemImageKey(hNode, _T("ItemImage1"));
 					g_pWnd->Internal_SetItemSubText(hNode, _T("5"));
 				}
 				break;
@@ -421,12 +456,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
  					g_pWnd->Internal_InsertItem(GetRandomString(), hNode2, STXTVI_FIRST, 0);
  					g_pWnd->Internal_InsertItem(GetRandomString(), hNode2, STXTVI_LAST, 0);
 
-					g_pWnd->SetItemImage(hNode, pStream1);
-					g_pWnd->SetItemImage(hNode2, pStream1);
-					g_pWnd->SetItemImage(hNode3, pStream1);
+					g_pWnd->SetItemImageKey(hNode, _T("ItemImage1"));
+					g_pWnd->SetItemImageKey(hNode2, _T("ItemImage1"));
+					g_pWnd->SetItemImageKey(hNode3, _T("ItemImage1"));
 
-// 					g_pWnd->SetItemImage(hNode3, pStream1);
-// 					g_pWnd->SetItemImage(hNode2, pStream2);
+// 					g_pWnd->SetItemImageKey(hNode3, _T("ItemImage1"));
+// 					g_pWnd->SetItemImageKey(hNode2, _T("ItemImage2"));
 				}
 				break;
 			case 1009:	//Delete Selection

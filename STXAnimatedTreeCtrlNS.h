@@ -73,7 +73,8 @@ typedef CSTXAnimatedTreeNodeNS* HSTXTREENODE;
 #define STXTVIS_HOVER						0x00020000
 #define STXTVIS_GRAY_IMAGE					0x01000000
 #define STXTVIS_IMAGE_CALLBACK				0x02000000
-#define STXTVIS_SUB_TEXT					0x04000000		//Use sub-text instead of sub-image at the right-bottom corner of item image 
+#define STXTVIS_SUB_TEXT					0x04000000		//Use sub-text instead of sub-image at the right-bottom corner of item image
+#define STXTVIS_FULL_ROW_BACKGROUND			0x08000000
 
 //TreeControl State
 #define STXTVS_NO_LINES						0x0001
@@ -194,6 +195,7 @@ protected:
 	long m_nAccID;
 	DWORD m_dwItemStyle;
 	int m_nBoundsMaxX;			//the right-most edge of this item. -1 means not calculated or need update
+	Gdiplus::Color m_clrBackground;
 
 	INT_PTR m_iIndexBeforeSort;		//Used internally to keep track of the original index
 	BOOL m_bPreDeleteNotified;		//Used internally
@@ -206,9 +208,11 @@ protected:
 #ifdef UNICODE
 	std::wstring m_strText;
 	std::wstring m_strSubText;		//Will be drawn at the right-bottom corner of the item image if STXTVIS_SUB_TEXT specified
+	std::wstring m_strImageKey;
 #else
 	std::string m_strText;
 	std::string m_strSubText;
+	std::string m_strImageKey;
 #endif
 
 protected:
@@ -222,6 +226,7 @@ protected:
 	void DrawItem( Gdiplus::Graphics *pGraphics, Gdiplus::RectF* rectItem, Gdiplus::RectF* rectItemFinal, DOUBLE fBaseOffset, Gdiplus::REAL fHorzOffset, int nHeightLimit, DOUBLE fBaseOpacity, DOUBLE fGlobalExpanderOpacity);
 	void DrawExpandMark(Gdiplus::Graphics * pGraphics, Gdiplus::RectF *rectItem, Gdiplus::RectF* rectItemFinal, Gdiplus::REAL fHorzOffset, DOUBLE fNodeOpacity, DOUBLE fGlobalExpanderOpacity);
 	void DrawLines(Gdiplus::Graphics * pGraphics, Gdiplus::RectF *rectItem, Gdiplus::RectF* rectItemFinal, Gdiplus::REAL fHorzOffset, DOUBLE fNodeOpacity, DOUBLE fGlobalLineOpacity);
+	void DrawBackground(Gdiplus::Graphics * pGraphics, Gdiplus::RectF *rectItem, Gdiplus::RectF* rectItemFinal, Gdiplus::REAL fHorzOffset, DOUBLE fNodeOpacity, int iImageOccupie);
 	void DrawHover(Gdiplus::Graphics * pGraphics, Gdiplus::RectF *rectItem, Gdiplus::RectF* rectItemFinal, Gdiplus::REAL fHorzOffset, DOUBLE fNodeOpacity, int iImageOccupie);
 	void DrawSelection(Gdiplus::Graphics * pGraphics, Gdiplus::RectF *rectItem, Gdiplus::RectF* rectItemFinal, Gdiplus::REAL fHorzOffset, DOUBLE fNodeOpacity, int iImageOccupie);
 	void DrawDropHighlight( Gdiplus::Graphics * pGraphics, Gdiplus::RectF *rectItem, Gdiplus::RectF* rectItemFinal, DOUBLE fNodeOpacity);
@@ -234,6 +239,7 @@ protected:
 	void OnMouseLeave();
 	void MarkDeleting();
 	void GetItemScreenRect(__out LPRECT lprcRect);
+	BOOL HasImage() const;
 
 protected:
 
@@ -304,6 +310,12 @@ protected:
 	Gdiplus::Color m_clrBackground;
 	std::vector<HSTXTREENODE> m_arrEnumItems;
 	std::map<long, HSTXTREENODE> m_mapAccIdToItem;
+
+#ifdef UNICODE
+	std::map<std::wstring, std::shared_ptr<Gdiplus::Image>> m_cachedImages;
+#else
+	std::map<std::string, std::shared_ptr<Gdiplus::Image>> m_cachedImages;
+#endif
 
 	HSTXTREENODE m_hLastHoverNode;
 	HSTXTREENODE m_hLastFloatTriggeredNode;
@@ -439,6 +451,7 @@ protected:
 	void OnItemFloatCheckTriggered();
 	int GetItemMaxBoundsX(HSTXTREENODE hItem);
 	void GetDefaultFontInfo();
+	void GetItemImageInUse(HSTXTREENODE hItem, std::shared_ptr<Gdiplus::Image>& img) const;
 
 protected:
 	virtual void OnEndEdit();
@@ -475,8 +488,13 @@ public:
 	HSTXTREENODE Internal_GetPrevVisibleItem(HSTXTREENODE hItem);
 	HSTXTREENODE Internal_GetPrevSiblingItem(HSTXTREENODE hItem);
 	BOOL Internal_EnsureVisible(HSTXTREENODE hItem);
+	BOOL CacheImage(LPCTSTR lpszImageKey, IStream* pStream, int cachedDimension = -1);
+	BOOL CacheImage(LPCTSTR lpszImageKey, LPCTSTR lpszImageFile, int cachedDimension = -1);
+	BOOL RemoveCachedImage(LPCTSTR lpszImageKey);
+	void ClearCachedImages();
 	BOOL SetItemImage(HSTXTREENODE hItem, IStream *pStream, BOOL bResizeImage = FALSE);
 	void SetItemImage(HSTXTREENODE hItem, LPCTSTR lpszImageFile, BOOL bResizeImage = FALSE);
+	BOOL SetItemImageKey(HSTXTREENODE hItem, LPCTSTR lpszImageKey);
 	void SetItemImageCallback(HSTXTREENODE hItem, BOOL bUseImageCallback);
 	BOOL SetItemSubImage(HSTXTREENODE hItem, IStream *pStream);
 	void SetItemSubImage(HSTXTREENODE hItem, LPCTSTR lpszImageFile);
@@ -510,6 +528,8 @@ public:
 	BOOL SetItemIndent(int nItemIndent);
 	BOOL Internal_SetItemText(HSTXTREENODE hItem, LPCTSTR pszText);
 	BOOL Internal_SetItemSubText(HSTXTREENODE hItem, LPCTSTR pszSubText);
+	BOOL Internal_SetItemFullRowBackground(HSTXTREENODE hItem, BOOL bFullRowBackground);
+	BOOL Internal_SetItemBackgroundColor(HSTXTREENODE hItem, COLORREF color, BYTE alpha);
 	int GetCurrentContentWidth();
 	Gdiplus::Font* GetDefaultFont();
 	Gdiplus::Font* GetDefaultSubTextFont();
