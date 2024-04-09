@@ -312,8 +312,10 @@ protected:
 	std::map<long, HSTXTREENODE> m_mapAccIdToItem;
 
 #ifdef UNICODE
+	std::wstring m_highlightTokens;
 	std::map<std::wstring, std::shared_ptr<Gdiplus::Image>> m_cachedImages;
 #else
+	std::string m_highlightTokens;
 	std::map<std::string, std::shared_ptr<Gdiplus::Image>> m_cachedImages;
 #endif
 
@@ -536,4 +538,5 @@ public:
 	BOOL SetWatermarkLocation(UINT nLocation);		//see STXTV_WATERMARK_ macros
 	void SetWatermarkOpacity(double fOpacity);		//0.0f (transparent) to 1.0f (opacity)
 	BOOL Internal_SelectItem(HSTXTREENODE hItem);
+	void Internal_SetHighlightTokens(LPCTSTR tokens);
 };

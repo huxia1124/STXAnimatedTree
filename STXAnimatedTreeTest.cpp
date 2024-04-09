@@ -26,6 +26,8 @@ CSTXAnimatedTreeCtrlNS *g_pWnd = nullptr;
 CSTXAnimatedTreeCtrl *g_pWnd = nullptr;
 #endif
 
+HWND g_hWndEdit = nullptr;
+
 CSTXAnchor *_anchor = nullptr;
 
 //Item comparing function
@@ -251,7 +253,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 
    hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW|WS_CLIPCHILDREN,
-	   CW_USEDEFAULT, 0, 640, 600, nullptr, nullptr, hInstance, nullptr);
+	   CW_USEDEFAULT, 0, 640, 620, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {
@@ -266,12 +268,16 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    g_pWnd->Create(szTitle, WS_CHILD|WS_VISIBLE|WS_TABSTOP|WS_BORDER,
 	   0, 0, 320, 520, hWnd, 600);
 
+   g_hWndEdit = CreateWindow(_T("Edit"), _T(""), WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL, 2, 530, 316, 20, hWnd, reinterpret_cast<HMENU>(601), nullptr, nullptr);
+   Edit_SetCueBannerText(g_hWndEdit, _T("Search"));
+
    _anchor = new CSTXAnchor(hWnd);
 
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
    _anchor->AddItem(g_pWnd->GetSafeHwnd(), STXANCHOR_ALL);
+   _anchor->AddItem(g_hWndEdit, STXANCHOR_LEFT | STXANCHOR_RIGHT | STXANCHOR_BOTTOM);
 
    //g_pWnd->ModifyStyle(0, STXTVS_ALWAYS_SHOW_EXPANDER|STXTVS_NO_LINES);
    g_pWnd->ModifyStyle(0, STXTVS_HORIZONTAL_SCROLL);
@@ -411,7 +417,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 
-		if(HIWORD(wParam) == BN_CLICKED)
+		if (HIWORD(wParam) == EN_CHANGE)
+		{
+			TCHAR buffer[MAX_PATH];
+			GetWindowText(g_hWndEdit, buffer, MAX_PATH);
+			g_pWnd->Internal_SetHighlightTokens(buffer);
+		}
+		else if(HIWORD(wParam) == BN_CLICKED)
 		{
 			switch(LOWORD(wParam))
 			{

@@ -15,8 +15,9 @@
 //CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //DEALINGS IN THE SOFTWARE.
 
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "STXAnimatedTreeCtrlNS.h"
+#include "HighlightTextPainter.h"
 #include <Shlwapi.h>
 #include <algorithm>
 
@@ -237,9 +238,9 @@ void CSTXAnimatedTreeNodeNS::DrawItem(Gdiplus::Graphics *pGraphics, Gdiplus::Rec
 		if(m_pParentControl->m_pfnItemDrawFunc == nullptr || m_pParentControl->m_pfnItemDrawFunc(&itemDraw) == STXTV_CDRF_DODEFAULT)
 		{
 			Gdiplus::PointF ptTextMain(rectItem->X + iImageOccupie, rectItem->Y);
-			Gdiplus::StringFormat strFormat;
-			
-			strFormat.SetFormatFlags(Gdiplus::StringFormatFlagsNoWrap);
+			Gdiplus::StringFormat strFormat(Gdiplus::StringFormat::GenericTypographic());
+
+			strFormat.SetFormatFlags(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsMeasureTrailingSpaces);
 			if ((m_pParentControl->GetStyle() & STXTVS_HORIZONTAL_SCROLL) == 0)
 			{
 				strFormat.SetTrimming(Gdiplus::StringTrimmingEllipsisWord);
@@ -251,7 +252,12 @@ void CSTXAnimatedTreeNodeNS::DrawItem(Gdiplus::Graphics *pGraphics, Gdiplus::Rec
 			if(iTextTopOffsetPatch > 0)
 				rectTextMain.Y += iTextTopOffsetPatch;
 
-			pGraphics->DrawString(m_strText.c_str(), -1, m_pParentControl->GetDefaultFont(), rectTextMain, &strFormat, &textBrush);
+			HighlightTextPainter::DefaultSplitter splitter(false);
+			HighlightTextPainter text(&splitter, m_strText.c_str(), m_pParentControl->m_highlightTokens.c_str());
+			HighlightTextPainter::GDIPlusPainter painter(*pGraphics, *m_pParentControl->GetDefaultFont(), strFormat, static_cast<BYTE>(255 * fNodeOpacity));
+			text.Draw(&painter, rectTextMain.X, rectTextMain.Y, rectTextMain.Width, rectTextMain.Height, m_bSelected);
+
+			//pGraphics->DrawString(m_strText.c_str(), -1, m_pParentControl->GetDefaultFont(), rectTextMain, &strFormat, &textBrush);
 		}
 	}
 
@@ -1026,7 +1032,7 @@ BOOL CSTXAnimatedTreeCtrlNS::Create( LPCTSTR lpszWindowText, DWORD dwStyle, int 
 	if(hWnd == nullptr)
 		return FALSE;
 
-	SetWindowLongPtr(hWnd, GWL_USERDATA, (LONG_PTR)this);
+	SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)this);
 	m_hwndControl = hWnd;
 
 //	HFONT hFont = (HFONT)::GetStockObject(DEFAULT_GUI_FONT);
@@ -1060,7 +1066,7 @@ void CSTXAnimatedTreeCtrlNS::OnTimer(UINT nIDEvent)
 
 LRESULT CALLBACK CSTXAnimatedTreeCtrlNS::STXAnimatedTreeWindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-	CSTXAnimatedTreeCtrlNS *pThis = (CSTXAnimatedTreeCtrlNS*)GetWindowLongPtr(hwnd, GWL_USERDATA);
+	CSTXAnimatedTreeCtrlNS *pThis = (CSTXAnimatedTreeCtrlNS*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
 	if(pThis == nullptr)
 		return DefWindowProc(hwnd, uMsg, wParam, lParam);
 
@@ -1147,6 +1153,7 @@ void CSTXAnimatedTreeCtrlNS::DrawControl(HDC hDC)
 	Gdiplus::Graphics g(hDC);
 	Gdiplus::Bitmap bmpMem(rcThis.right - rcThis.left, rcThis.bottom - rcThis.top);
 	Gdiplus::Graphics *pMemGraphics = Gdiplus::Graphics::FromImage(&bmpMem);
+	pMemGraphics->SetTextRenderingHint(Gdiplus::TextRenderingHintAntiAlias);
 
 	DrawBackground(pMemGraphics, &rectThis);
 	DrawWatermark(pMemGraphics, &rectThis);
@@ -4250,3 +4257,13 @@ BOOL CSTXAnimatedTreeCtrlNS::Internal_SelectItem(HSTXTREENODE hItem)
 	return TRUE;
 }
 
+void CSTXAnimatedTreeCtrlNS::Internal_SetHighlightTokens(LPCTSTR tokens)
+{
+	if (tokens)
+		m_highlightTokens = tokens;
+	else
+		m_highlightTokens.clear();
+
+	if (GetSafeHwnd())
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
+}
