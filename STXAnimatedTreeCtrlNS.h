@@ -207,11 +207,13 @@ protected:
 
 #ifdef UNICODE
 	std::wstring m_strText;
-	std::wstring m_strSubText;		//Will be drawn at the right-bottom corner of the item image if STXTVIS_SUB_TEXT specified
+	std::wstring m_strSubText;				//Will be drawn at the right-bottom corner of the item image if STXTVIS_SUB_TEXT specified
+	std::wstring m_strAdditionalText;		//Will be drawn at the right side of the item
 	std::wstring m_strImageKey;
 #else
 	std::string m_strText;
-	std::string m_strSubText;
+	std::string m_strSubText;				//Will be drawn at the right-bottom corner of the item image if STXTVIS_SUB_TEXT specified
+	std::string m_strAdditionalText;		//Will be drawn at the right side of the item
 	std::string m_strImageKey;
 #endif
 
@@ -530,6 +532,7 @@ public:
 	BOOL SetItemIndent(int nItemIndent);
 	BOOL Internal_SetItemText(HSTXTREENODE hItem, LPCTSTR pszText);
 	BOOL Internal_SetItemSubText(HSTXTREENODE hItem, LPCTSTR pszSubText);
+	BOOL Internal_SetItemAdditionalText(HSTXTREENODE hItem, LPCTSTR pszAdditionalText);
 	BOOL Internal_SetItemFullRowBackground(HSTXTREENODE hItem, BOOL bFullRowBackground);
 	BOOL Internal_SetItemBackgroundColor(HSTXTREENODE hItem, COLORREF color, BYTE alpha);
 	int GetCurrentContentWidth();

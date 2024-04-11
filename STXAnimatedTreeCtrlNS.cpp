@@ -232,7 +232,7 @@ void CSTXAnimatedTreeNodeNS::DrawItem(Gdiplus::Graphics *pGraphics, Gdiplus::Rec
 
 		DrawItemImage(pGraphics, rectItem, rectItemFinal, fHorzOffset, fNodeOpacity, &itemDraw);
 
-		Gdiplus::RectF rectTextMain(rectItem->X + iImageOccupie - fHorzOffset, rectItem->Y, rectItem->Width - iImageOccupie + fHorzOffset + STXAT_MEASURE_STRING_WIDTH_FIX, rectItem->Height);
+		Gdiplus::RectF rectTextMain(rectItem->X + iImageOccupie - fHorzOffset, rectItem->Y, rectItem->Width - iImageOccupie + fHorzOffset, rectItem->Height);
 		itemDraw.rectPart = &rectTextMain;
 		itemDraw.dwStage = STXTV_STAGE_TEXT;
 		if(m_pParentControl->m_pfnItemDrawFunc == nullptr || m_pParentControl->m_pfnItemDrawFunc(&itemDraw) == STXTV_CDRF_DODEFAULT)
@@ -248,16 +248,45 @@ void CSTXAnimatedTreeNodeNS::DrawItem(Gdiplus::Graphics *pGraphics, Gdiplus::Rec
 
 			Gdiplus::RectF rectTextMeasured;
 			pGraphics->MeasureString(m_strText.c_str(), -1, m_pParentControl->GetDefaultFont(), rectTextMain, &strFormat, &rectTextMeasured);
-			int iTextTopOffsetPatch = static_cast<int>((rectTextMain.Height - rectTextMeasured.Height) / 2);
-			if(iTextTopOffsetPatch > 0)
-				rectTextMain.Y += iTextTopOffsetPatch;
 
-			HighlightTextPainter::DefaultSplitter splitter(false);
-			HighlightTextPainter text(&splitter, m_strText.c_str(), m_pParentControl->m_highlightTokens.c_str());
+			int iTextTopOffsetPatch = 0;
 			HighlightTextPainter::GDIPlusPainter painter(*pGraphics, *m_pParentControl->GetDefaultFont(), strFormat, static_cast<BYTE>(255 * fNodeOpacity));
-			text.Draw(&painter, rectTextMain.X, rectTextMain.Y, rectTextMain.Width, rectTextMain.Height, m_bSelected);
+			HighlightTextPainter::DefaultSplitter splitter(false);
 
-			//pGraphics->DrawString(m_strText.c_str(), -1, m_pParentControl->GetDefaultFont(), rectTextMain, &strFormat, &textBrush);
+			if (!m_strAdditionalText.empty() && rectTextMain.Width - rectTextMeasured.Width > 16)
+			{
+				Gdiplus::StringFormat strFormatAdditionalText;
+
+				strFormatAdditionalText.SetFormatFlags(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsMeasureTrailingSpaces);
+				//if ((m_pParentControl->GetStyle() & STXTVS_HORIZONTAL_SCROLL) == 0)
+				//{
+				//	strFormat.SetTrimming(Gdiplus::StringTrimmingEllipsisWord);
+				//}
+
+				Gdiplus::RectF rectAdditionalTextMeasured;
+				pGraphics->MeasureString(m_strAdditionalText.c_str(), -1, m_pParentControl->GetDefaultFont(), rectTextMain, &strFormatAdditionalText, &rectAdditionalTextMeasured);
+				iTextTopOffsetPatch = static_cast<int>((rectTextMain.Height - rectAdditionalTextMeasured.Height) / 2);
+				if (iTextTopOffsetPatch < 0)
+					iTextTopOffsetPatch = 0;
+
+				HighlightTextPainter textAdditional(&splitter, m_strAdditionalText.c_str(), m_pParentControl->m_highlightTokens.c_str());
+				textAdditional.Draw(&painter, rectTextMain.X + rectTextMain.Width - rectAdditionalTextMeasured.Width, rectTextMain.Y + iTextTopOffsetPatch, rectTextMain.Width, rectTextMain.Height, m_bSelected);
+			}
+
+			iTextTopOffsetPatch = static_cast<int>((rectTextMain.Height - rectTextMeasured.Height) / 2);
+			if(iTextTopOffsetPatch < 0)
+				iTextTopOffsetPatch = 0;
+
+			if (m_pParentControl->m_highlightTokens.empty())
+			{
+				rectTextMain.Y += iTextTopOffsetPatch;
+				pGraphics->DrawString(m_strText.c_str(), -1, m_pParentControl->GetDefaultFont(), rectTextMain, &strFormat, &textBrush);
+			}
+			else
+			{
+				HighlightTextPainter text(&splitter, m_strText.c_str(), m_pParentControl->m_highlightTokens.c_str());
+				text.Draw(&painter, rectTextMain.X, rectTextMain.Y + iTextTopOffsetPatch, rectTextMain.Width, rectTextMain.Height, m_bSelected);
+			}
 		}
 	}
 
@@ -1028,7 +1057,7 @@ BOOL CSTXAnimatedTreeCtrlNS::Create( LPCTSTR lpszWindowText, DWORD dwStyle, int 
 	m_AnimationManager->CreateAnimationVariable(0.0, &m_pAVExpanderOpacity);
 
 
-	HWND hWnd = CreateWindow(s_lpszAnimatedTreeCtrlClassName, lpszWindowText, dwStyle, x, y, cx, cy, hWndParent, (HMENU)nID, GetModuleHandle(nullptr), nullptr);
+	HWND hWnd = CreateWindow(s_lpszAnimatedTreeCtrlClassName, lpszWindowText, dwStyle, x, y, cx, cy, hWndParent, reinterpret_cast<HMENU>(nID), GetModuleHandle(nullptr), nullptr);
 	if(hWnd == nullptr)
 		return FALSE;
 
@@ -4065,6 +4094,26 @@ BOOL CSTXAnimatedTreeCtrlNS::Internal_SetItemSubText(HSTXTREENODE hItem, LPCTSTR
 	{
 		hItem->m_strSubText.clear();
 		hItem->m_dwItemStyle &= (~STXTVIS_SUB_TEXT);
+	}
+
+	if (GetSafeHwnd())
+		InvalidateRect(m_hwndControl, nullptr, TRUE);
+
+	return TRUE;
+}
+
+BOOL CSTXAnimatedTreeCtrlNS::Internal_SetItemAdditionalText(HSTXTREENODE hItem, LPCTSTR pszAdditionalText)
+{
+	if (hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_ROOT || hItem == STXTVI_SORT)
+		return FALSE;
+
+	if (pszAdditionalText)
+	{
+		hItem->m_strAdditionalText = pszAdditionalText;
+	}
+	else
+	{
+		hItem->m_strAdditionalText.clear();
 	}
 
 	if (GetSafeHwnd())

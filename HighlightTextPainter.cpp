@@ -133,7 +133,18 @@ void HighlightTextPainter::DefaultSplitter::Split(const wchar_t* text, const wch
 	for (auto its = tokens.begin(); its != tokens.end(); ++its)
 	{
 		trim(*its);
-		rgxExpression += *its;
+		std::wstring escaped;
+		for (auto c : *its)
+		{
+			if (c == '\\' || c == '^' || c == '$' || c == '.' || c == '|' || c == '?' || c == '*' || c == '+' ||
+				c == '(' || c == ')' || c == '[' || c == ']' || c == '{' || c == '}')
+			{
+				escaped += '\\';
+			}
+			escaped += c;
+		}
+
+		rgxExpression += escaped;
 
 		if (its + 1 != tokens.end())
 		{
