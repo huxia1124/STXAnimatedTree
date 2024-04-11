@@ -154,9 +154,9 @@ CSTXAnchor::CSTXAnchor(HWND hSizeTraceWnd)
 	}
 	else
 	{
-		DWORD dwReferenceCount = (DWORD)::GetProp(hSizeTraceWnd,_T("STX_WNDPROC_REFERENCE_COUNT"));
+		DWORD dwReferenceCount = static_cast<DWORD>(reinterpret_cast<DWORD_PTR>(::GetProp(hSizeTraceWnd, _T("STX_WNDPROC_REFERENCE_COUNT"))));
 		dwReferenceCount++;
-		::SetProp(hSizeTraceWnd,_T("STX_WNDPROC_REFERENCE_COUNT"),(HANDLE)dwReferenceCount);
+		::SetProp(hSizeTraceWnd, _T("STX_WNDPROC_REFERENCE_COUNT"), reinterpret_cast<HANDLE>(static_cast<DWORD_PTR>(dwReferenceCount)));
 	}
 }
 
@@ -171,11 +171,11 @@ CSTXAnchor::~CSTXAnchor()
 		strAnchorDataName.Format(_T("STX_ANCHOR_DATA_%d"),m_iAnchorID);
 		::RemoveProp(m_hSizeTraceWnd,strAnchorDataName);
 
-		DWORD dwReferenceCount = (DWORD)::GetProp(m_hSizeTraceWnd,_T("STX_WNDPROC_REFERENCE_COUNT"));
+		DWORD dwReferenceCount = static_cast<DWORD>(reinterpret_cast<DWORD_PTR>(::GetProp(m_hSizeTraceWnd,_T("STX_WNDPROC_REFERENCE_COUNT"))));
 		dwReferenceCount--;
 		if(dwReferenceCount > 0)
 		{
-			::SetProp(m_hSizeTraceWnd,_T("STX_WNDPROC_REFERENCE_COUNT"),(HANDLE)dwReferenceCount);
+			::SetProp(m_hSizeTraceWnd, _T("STX_WNDPROC_REFERENCE_COUNT"), reinterpret_cast<HANDLE>(static_cast<DWORD_PTR>(dwReferenceCount)));
 		}
 		else
 		{
@@ -216,12 +216,12 @@ void CSTXAnchor::InsertItem(int iIndex,UINT uDlgItemID,DWORD dwAnchor)
 
 void CSTXAnchor::AddItem(HWND hToolWnd,DWORD dwAnchor)
 {
-	InsertItem(m_arrpItems.size(), hToolWnd,dwAnchor);
+	InsertItem(static_cast<int>(m_arrpItems.size()), hToolWnd,dwAnchor);
 }
 
 void CSTXAnchor::AddItem(UINT uDlgItemID,DWORD dwAnchor)
 {
-	InsertItem(m_arrpItems.size(),uDlgItemID,dwAnchor);
+	InsertItem(static_cast<int>(m_arrpItems.size()),uDlgItemID,dwAnchor);
 }
 
 void CSTXAnchor::Adjust(int cxOld,int cyOld,int cxNew,int cyNew)
@@ -289,14 +289,14 @@ LRESULT CALLBACK CSTXAnchor::NewWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 		}
 	}
 	
-	WNDPROC pfnOldWndProc = (WNDPROC)::GetProp(hwnd,_T("STX_ORIGIN_WNDPROC"));
-	return CallWindowProc(pfnOldWndProc,hwnd,uMsg,wParam,lParam);
+	WNDPROC pfnOldWndProc = (WNDPROC)::GetProp(hwnd, _T("STX_ORIGIN_WNDPROC"));
+	return CallWindowProc(pfnOldWndProc, hwnd, uMsg, wParam, lParam);
 }
 
 BOOL CALLBACK CSTXAnchor::EnumChildProc(HWND hwnd, LPARAM lParam)
 {
-	DWORD_PTR *pData = (DWORD_PTR*)lParam;
+	DWORD_PTR* pData = (DWORD_PTR*)lParam;
 	CSTXAnchor* pAnchor = (CSTXAnchor*)pData[0];
-	pAnchor->AddItem((UINT)GetDlgCtrlID(hwnd),pData[1]);
+	pAnchor->AddItem((UINT)GetDlgCtrlID(hwnd), static_cast<DWORD>(pData[1]));
 	return TRUE;
 }

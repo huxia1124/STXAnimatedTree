@@ -269,8 +269,19 @@ void CSTXAnimatedTreeNodeNS::DrawItem(Gdiplus::Graphics *pGraphics, Gdiplus::Rec
 				if (iTextTopOffsetPatch < 0)
 					iTextTopOffsetPatch = 0;
 
-				HighlightTextPainter textAdditional(&splitter, m_strAdditionalText.c_str(), m_pParentControl->m_highlightTokens.c_str());
-				textAdditional.Draw(&painter, rectTextMain.X + rectTextMain.Width - rectAdditionalTextMeasured.Width, rectTextMain.Y + iTextTopOffsetPatch, rectTextMain.Width, rectTextMain.Height, m_bSelected);
+				Gdiplus::RectF rectAdditionalText(rectTextMain.X + rectTextMain.Width - rectAdditionalTextMeasured.Width, rectTextMain.Y + iTextTopOffsetPatch, rectTextMain.Width, rectTextMain.Height);
+				rectAdditionalText.Y += iTextTopOffsetPatch;
+
+				if (m_pParentControl->m_highlightTokens.empty())
+				{
+					Gdiplus::SolidBrush additionalTextBrush(Gdiplus::Color(static_cast<BYTE>(144 * fNodeOpacity), GetRValue(clrTextColor), GetGValue(clrTextColor), GetBValue(clrTextColor)));
+					pGraphics->DrawString(m_strAdditionalText.c_str(), -1, m_pParentControl->GetDefaultFont(), rectAdditionalText, &strFormat, &additionalTextBrush);
+				}
+				else
+				{
+					HighlightTextPainter textAdditional(&splitter, m_strAdditionalText.c_str(), m_pParentControl->m_highlightTokens.c_str());
+					textAdditional.Draw(&painter, rectAdditionalText.X, rectAdditionalText.Y, rectAdditionalText.Width, rectAdditionalText.Height, m_bSelected);
+				}
 			}
 
 			iTextTopOffsetPatch = static_cast<int>((rectTextMain.Height - rectTextMeasured.Height) / 2);
@@ -1057,7 +1068,7 @@ BOOL CSTXAnimatedTreeCtrlNS::Create( LPCTSTR lpszWindowText, DWORD dwStyle, int 
 	m_AnimationManager->CreateAnimationVariable(0.0, &m_pAVExpanderOpacity);
 
 
-	HWND hWnd = CreateWindow(s_lpszAnimatedTreeCtrlClassName, lpszWindowText, dwStyle, x, y, cx, cy, hWndParent, reinterpret_cast<HMENU>(nID), GetModuleHandle(nullptr), nullptr);
+	HWND hWnd = CreateWindow(s_lpszAnimatedTreeCtrlClassName, lpszWindowText, dwStyle, x, y, cx, cy, hWndParent, reinterpret_cast<HMENU>(static_cast<UINT_PTR>(nID)), GetModuleHandle(nullptr), nullptr);
 	if(hWnd == nullptr)
 		return FALSE;
 
@@ -1122,28 +1133,28 @@ LRESULT CALLBACK CSTXAnimatedTreeCtrlNS::STXAnimatedTreeWindowProc( HWND hwnd, U
 		pThis->OnVScroll(LOWORD(wParam), HIWORD(wParam), (HWND)lParam);
 		break;
 	case WM_LBUTTONDOWN:
-		pThis->OnLButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+		pThis->OnLButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), static_cast<UINT>(wParam));
 		break;
 	case WM_LBUTTONUP:
-		pThis->OnLButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+		pThis->OnLButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), static_cast<UINT>(wParam));
 		break;
 	case WM_RBUTTONDOWN:
-		pThis->OnRButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+		pThis->OnRButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), static_cast<UINT>(wParam));
 		break;
 	case WM_RBUTTONUP:
-		pThis->OnRButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+		pThis->OnRButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), static_cast<UINT>(wParam));
 		break;
 	case WM_LBUTTONDBLCLK:
-		pThis->OnLButtonDblClk(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+		pThis->OnLButtonDblClk(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), static_cast<UINT>(wParam));
 		break;
 	case WM_MOUSEWHEEL:
 		pThis->OnMouseWheel(GET_KEYSTATE_WPARAM(wParam), GET_WHEEL_DELTA_WPARAM(wParam), LOWORD(lParam), HIWORD(lParam));
 		break;
 	case WM_KEYDOWN:
-		pThis->OnKeyDown(wParam, LOWORD(lParam), HIWORD(lParam));
+		pThis->OnKeyDown(static_cast<UINT>(wParam), LOWORD(lParam), HIWORD(lParam));
 		break;
 	case WM_MOUSEMOVE:
-		pThis->OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), wParam);
+		pThis->OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), static_cast<UINT>(wParam));
 		break;
 	case WM_MOUSELEAVE:
 		pThis->OnMouseLeave();
@@ -1167,7 +1178,7 @@ LRESULT CALLBACK CSTXAnimatedTreeCtrlNS::STXAnimatedTreeWindowProc( HWND hwnd, U
 	case WM_GETDLGCODE:
 		return pThis->OnGetDlgCode();
 	case WM_SIZE:
-		pThis->OnSize(wParam, LOWORD(lParam), HIWORD(lParam));
+		pThis->OnSize(static_cast<UINT>(wParam), LOWORD(lParam), HIWORD(lParam));
 		break;
 	}
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
@@ -3435,10 +3446,10 @@ BOOL CSTXAnimatedTreeCtrlNS::Internal_SortChildrenByItem( HSTXTREENODE hItem, st
 int CSTXAnimatedTreeCtrlNS::Internal_GetItemText( HSTXTREENODE hItem, LPTSTR pszTextBuffer, int cchBufferLen )
 {
 	if(hItem == nullptr || hItem == STXTVI_FIRST || hItem == STXTVI_LAST || hItem == STXTVI_SORT)
-		return FALSE;
+		return 0;
 
 	if(pszTextBuffer == nullptr)
-		return hItem->m_strText.size();
+		return static_cast<int>(hItem->m_strText.size());
 
 	_tcscpy_s(pszTextBuffer, cchBufferLen, hItem->m_strText.c_str());
 	return min(cchBufferLen, (int)hItem->m_strText.size());
@@ -3586,7 +3597,7 @@ int CSTXAnimatedTreeCtrlNS::GetDescendantItems( HSTXTREENODE hItem, std::vector<
 		pArrItems->push_back((*it).get());
 		GetDescendantItems((*it).get(), pArrItems);
 	}
-	return pArrItems->size();
+	return static_cast<int>(pArrItems->size());
 }
 
 BOOL CSTXAnimatedTreeCtrlNS::IsValidItem( HSTXTREENODE hItem )
